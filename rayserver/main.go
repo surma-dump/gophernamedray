@@ -12,8 +12,8 @@ import (
 )
 
 const (
-	Width  = 320
-	Height = 240
+	Width  = 800
+	Height = 600
 )
 
 func main() {
@@ -47,13 +47,14 @@ func main() {
 		Max: image.Point{Width, Height},
 	})
 
+	fog := gnr.LerpCap(0, 100, 255, 0)
 	for x := uint64(0); x < Width; x++ {
 		for y := uint64(0); y < Height; y++ {
-			c, _ := scene.TracePixel(x, y)
+			_, d := scene.TracePixel(x, y)
 			col := color.RGBA{
-				R: uint8(255 * c.R),
-				G: uint8(255 * c.G),
-				B: uint8(255 * c.B),
+				R: uint8(fog(d)),
+				G: uint8(fog(d)),
+				B: uint8(fog(d)),
 				A: 255,
 			}
 			img.Set(int(x), int(y), col)
