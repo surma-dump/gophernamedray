@@ -10,6 +10,6 @@ type Ray struct {
 	Intensity float64
 }
 
-func (r *Ray) String() string {
+func (r Ray) String() string {
 	return fmt.Sprintf("%s+t*%s (%0.3f)", r.Origin.String(), r.Direction.String(), r.Intensity)
 }

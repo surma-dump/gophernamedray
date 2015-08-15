@@ -10,40 +10,41 @@ type Interval struct {
 }
 
 var (
-	INTERVAL_ALL = &Interval{
+	IntervalAll = Interval{
 		Min: math.Inf(-1),
 		Max: math.Inf(1),
 	}
 
-	INTERVAL_POSITIVE = &Interval{
+	IntervalPositive = Interval{
 		Min: 0,
 		Max: math.Inf(1),
 	}
+
+	IntervalEmpty = Interval{
+		Min: 0,
+		Max: -1,
+	}
 )
 
-func IntervalIntersection(a, b *Interval) *Interval {
+func IntervalIntersection(a, b Interval) Interval {
 	if a.Empty() || b.Empty() {
-		return &Interval{
-			Min: 0,
-			Max: -1,
-		}
+		return IntervalEmpty
 	}
-	return &Interval{
+	return Interval{
 		Min: max(a.Min, b.Min),
 		Max: min(a.Max, b.Max),
 	}
 }
 
-func (i *Interval) Intersect(other *Interval) *Interval {
+func (i Interval) Intersect(other Interval) Interval {
 	return IntervalIntersection(i, other)
 }
 
-func (i *Interval) Normalize() *Interval {
-	r := *i
+func (i Interval) Normalize() Interval {
 	if i.Min > i.Max {
-		r.Min, r.Max = r.Max, r.Min
+		i.Min, i.Max = i.Max, i.Min
 	}
-	return &r
+	return i
 }
 
 func min(a, b float64) float64 {
@@ -60,11 +61,11 @@ func max(a, b float64) float64 {
 	return b
 }
 
-func (i *Interval) Empty() bool {
+func (i Interval) Empty() bool {
 	return i.Max < i.Min
 }
 
-func (i *Interval) String() string {
+func (i Interval) String() string {
 	if i.Empty() {
 		return "ø"
 	}

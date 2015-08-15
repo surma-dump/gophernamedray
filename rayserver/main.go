@@ -1,18 +1,19 @@
 package main
 
 import (
-	"gnr"
-	"gnr/object"
 	"image"
 	"image/color"
 	"image/png"
 	"log"
 	"os"
+
+	"github.com/surma-dump/gophernamedray/gnr"
+	"github.com/surma-dump/gophernamedray/gnr/object"
 )
 
 const (
-	WIDTH  = 320
-	HEIGHT = 240
+	Width  = 320
+	Height = 240
 )
 
 func main() {
@@ -20,39 +21,35 @@ func main() {
 		Camera: gnr.Camera{
 			Position: gnr.Vector3f{
 				X: 2,
-				Y: 0,
+				Y: 1,
 				Z: -3,
 			},
-			PixelWidth:    WIDTH,
-			PixelHeight:   HEIGHT,
+			PixelWidth:    Width,
+			PixelHeight:   Height,
 			VirtualWidth:  4,
 			VirtualHeight: 3,
 			Angle:         60.0,
 		},
 		Objects: []gnr.Object{
-			&object.Cube{
-				CornerMin: gnr.Vector3f{
-					X: -1,
-					Y: -1,
-					Z: -1,
-				},
-				CornerMax: gnr.Vector3f{
-					X: 1,
+			object.Plane{
+				Normal: gnr.Vector3f{
+					X: 0,
 					Y: 1,
-					Z: 1,
+					Z: 0,
 				},
+				Distance: 0,
 			},
 		},
 	}
 
 	img := image.NewRGBA(image.Rectangle{
 		Min: image.Point{0, 0},
-		Max: image.Point{WIDTH, HEIGHT},
+		Max: image.Point{Width, Height},
 	})
 
-	for x := uint64(0); x < WIDTH; x++ {
-		for y := uint64(0); y < HEIGHT; y++ {
-			c := scene.TracePixel(x, y)
+	for x := uint64(0); x < Width; x++ {
+		for y := uint64(0); y < Height; y++ {
+			c, _ := scene.TracePixel(x, y)
 			col := color.RGBA{
 				R: uint8(255 * c.R),
 				G: uint8(255 * c.G),

@@ -1,15 +1,15 @@
 package gnr
 
 var (
-	COLOR_BLACK = &Color{0, 0, 0}
-	COLOR_WHITE = &Color{1.0, 1.0, 1.0}
+	ColorBlack = Color{0, 0, 0}
+	ColorWhite = Color{1.0, 1.0, 1.0}
 )
 
 type Color struct {
 	R, G, B float64
 }
 
-func (c *Color) Normalize() {
+func (c Color) Normalize() {
 	if c.R < 0 {
 		c.R = 0
 	}
