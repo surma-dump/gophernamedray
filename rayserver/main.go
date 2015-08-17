@@ -25,7 +25,7 @@ func main() {
 			PixelHeight:   Height,
 			VirtualWidth:  1,
 			VirtualHeight: 1,
-			Angle:         12.0,
+			Angle:         40.0,
 		},
 		Objects: []gnr.Object{
 			object.Plane{
@@ -67,6 +67,10 @@ func main() {
 					gnr.Vector3f{0, 1, 1},
 				},
 			},
+			object.Sphere{
+				Center: gnr.Vector3f{0, 1, 2},
+				Radius: 1,
+			},
 		},
 	}
 
@@ -82,8 +86,7 @@ func main() {
 	// colImg := SubImage(img, image.Rect(Width, Height, 2*Width, 2*Height))
 
 	fFog := gnr.LerpCap(0, 10, 255, 0)
-	fColor := gnr.LerpCap(0, 1, 0, 255)
-	_, _ = fFog, fColor
+	fNormal := gnr.LerpCap(-1, 1, 0, 255)
 	for x := uint64(0); x < Width; x++ {
 		for y := uint64(0); y < Height; y++ {
 			hit, matColor, distance, normal := scene.TracePixel(x, y)
@@ -108,9 +111,9 @@ func main() {
 
 			// Normal image
 			col = color.RGBA{
-				R: uint8(fColor(normal.X)),
-				G: uint8(fColor(normal.Y)),
-				B: uint8(fColor(normal.Z)),
+				R: uint8(fNormal(normal.X)),
+				G: uint8(fNormal(normal.Y)),
+				B: uint8(fNormal(normal.Z)),
 				A: 255,
 			}
 			if hit {
