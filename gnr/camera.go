@@ -36,5 +36,5 @@ func (c Camera) GetRayForPixel(x, y uint64) Ray {
 }
 
 func (c Camera) GetScreenDistance() float64 {
-	return c.VirtualWidth / 2 * math.Tan(c.Angle*2*math.Pi/2/360)
+	return c.VirtualWidth / (2 * math.Tan(c.Angle/2/360*2*math.Pi))
 }

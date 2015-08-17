@@ -25,7 +25,7 @@ func main() {
 			PixelHeight:   Height,
 			VirtualWidth:  1,
 			VirtualHeight: 1,
-			Angle:         120.0,
+			Angle:         12.0,
 		},
 		Objects: []gnr.Object{
 			object.Plane{
