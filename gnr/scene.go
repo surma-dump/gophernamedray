@@ -31,7 +31,11 @@ func (s Scene) ShootRay(r Ray) (bool, Color, float64, Vector3f) {
 			normal: normal,
 		}
 		newIr.distance = VectorDifference(impact, r.Origin).Magnitude()
-		return newIr
+		// ir == nil happens if we are in the very first iteration
+		if ir == nil || newIr.distance < ir.distance {
+			return newIr
+		}
+		return ir
 	})
 	if ir == nil {
 		return false, ColorBlack, 0, r.Direction
