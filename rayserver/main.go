@@ -3,9 +3,9 @@ package main
 import (
 	"image"
 	"image/color"
+	"image/draw"
 	"image/png"
 	"log"
-	"math"
 	"os"
 
 	"github.com/surma-dump/gophernamedray/gnr"
@@ -13,8 +13,8 @@ import (
 )
 
 const (
-	Width  = 1024
-	Height = 1024
+	Width  = 600
+	Height = 600
 )
 
 func main() {
@@ -25,7 +25,7 @@ func main() {
 			PixelHeight:   Height,
 			VirtualWidth:  1,
 			VirtualHeight: 1,
-			Angle:         90.0,
+			Angle:         120.0,
 		},
 		Objects: []gnr.Object{
 			object.Plane{
@@ -72,21 +72,50 @@ func main() {
 
 	img := image.NewRGBA(image.Rectangle{
 		Min: image.Point{0, 0},
-		Max: image.Point{Width, Height},
+		Max: image.Point{Width * 2, Height * 2},
 	})
+	draw.Draw(img, img.Bounds(), &image.Uniform{color.Black}, image.Point{0, 0}, draw.Over)
 
-	fog := gnr.LerpCap(0, 10, 255, 0)
+	hitImg := gnr.SubImage(img, image.Rect(0, 0, Width, Height))
+	distImg := gnr.SubImage(img, image.Rect(Width, 0, 2*Width, Height))
+	normImg := gnr.SubImage(img, image.Rect(0, Height, Width, 2*Height))
+	// colImg := SubImage(img, image.Rect(Width, Height, 2*Width, 2*Height))
+
+	fFog := gnr.LerpCap(0, 10, 255, 0)
+	fColor := gnr.LerpCap(0, 1, 0, 255)
+	_, _ = fFog, fColor
 	for x := uint64(0); x < Width; x++ {
 		for y := uint64(0); y < Height; y++ {
-			_, d := scene.TracePixel(x, y)
-			grey := uint8(fog(math.Floor(d)))
+			hit, matColor, distance, normal := scene.TracePixel(x, y)
+
+			_, _, _, _ = hit, matColor, distance, normal
+
+			// Hit image
+			if hit {
+				hitImg.Set(int(x), int(y), color.White)
+			}
+
+			// Distance image
 			col := color.RGBA{
-				R: grey,
-				G: grey,
-				B: grey,
+				R: uint8(fFog(distance)),
+				G: uint8(fFog(distance)),
+				B: uint8(fFog(distance)),
 				A: 255,
 			}
-			img.Set(int(x), int(y), col)
+			if hit {
+				distImg.Set(int(x), int(y), col)
+			}
+
+			// Normal image
+			col = color.RGBA{
+				R: uint8(fColor(normal.X)),
+				G: uint8(fColor(normal.Y)),
+				B: uint8(fColor(normal.Z)),
+				A: 255,
+			}
+			if hit {
+				normImg.Set(int(x), int(y), col)
+			}
 		}
 	}
 

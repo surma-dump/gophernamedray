@@ -1,16 +1,12 @@
 package gnr
 
-import (
-	"math"
-)
-
 type Scene struct {
 	GlobalLighting bool
 	Camera         Camera
 	Objects        []Object
 }
 
-func (s Scene) TracePixel(x, y uint64) (Color, float64) {
+func (s Scene) TracePixel(x, y uint64) (bool, Color, float64, Vector3f) {
 	r := s.Camera.GetRayForPixel(x, y)
 	r.Intensity = 1.0
 	return s.ShootRay(r)
@@ -22,7 +18,7 @@ type interactionResult struct {
 	distance       float64
 }
 
-func (s Scene) ShootRay(r Ray) (Color, float64) {
+func (s Scene) ShootRay(r Ray) (bool, Color, float64, Vector3f) {
 	// Check ray interaction with all objects, only return the one closes to the origin
 	ir := ObjectSlice(s.Objects).AggregateInteractionResult(func(ir *interactionResult, o Object) *interactionResult {
 		hit, color, impact, normal := o.RayInteraction(r)
@@ -38,7 +34,7 @@ func (s Scene) ShootRay(r Ray) (Color, float64) {
 		return newIr
 	})
 	if ir == nil {
-		return ColorBlack, math.MaxFloat64
+		return false, ColorBlack, 0, r.Direction
 	}
-	return ir.color, ir.distance
+	return true, ir.color, ir.distance, ir.normal
 }
