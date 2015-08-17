@@ -60,3 +60,11 @@ func VectorProduct(v1, v2 Vector3f) float64 {
 func VectorAngle(v1, v2 Vector3f) float64 {
 	return math.Acos(VectorProduct(v1, v2))
 }
+
+func VectorCross(v1, v2 Vector3f) Vector3f {
+	return Vector3f{
+		X: v1.Y*v2.Z - v1.Z*v2.Y,
+		Y: -v1.X*v2.Z + v1.Z*v2.X,
+		Z: v1.X*v2.Y - v1.Y*v2.X,
+	}
+}

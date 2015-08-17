@@ -25,16 +25,16 @@ type interactionResult struct {
 func (s Scene) ShootRay(r Ray) (Color, float64) {
 	// Check ray interaction with all objects, only return the one closes to the origin
 	ir := ObjectSlice(s.Objects).AggregateInteractionResult(func(ir *interactionResult, o Object) *interactionResult {
-		if !o.RayCollision(r) {
+		hit, color, impact, normal := o.RayInteraction(r)
+		if !hit {
 			return ir
 		}
-		c, i, n := o.RayInteraction(r)
 		newIr := &interactionResult{
-			color:  c,
-			impact: i,
-			normal: n,
+			color:  color,
+			impact: impact,
+			normal: normal,
 		}
-		newIr.distance = VectorDifference(i, r.Origin).Magnitude()
+		newIr.distance = VectorDifference(impact, r.Origin).Magnitude()
 		return newIr
 	})
 	if ir == nil {
