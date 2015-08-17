@@ -22,18 +22,23 @@ func (t Triangle) ToPlane() Plane {
 	}
 }
 
-func (t Triangle) RayInteraction(r gnr.Ray) (bool, gnr.Color, gnr.Vector3f, gnr.Vector3f) {
+func (t Triangle) RayInteraction(r gnr.Ray) (gnr.InteractionResult, bool) {
 	isInside := true
-	ok, color, impact, normal := t.ToPlane().RayInteraction(r)
+	ir, ok := t.ToPlane().RayInteraction(r)
 	if !ok {
-		return false, color, impact, normal
+		return gnr.InteractionResult{}, false
 	}
 
 	for i := 0; i < 3; i++ {
 		p := Triangle{
 			Points: [3]gnr.Vector3f{r.Origin, t.Points[i], t.Points[(i+1)%3]},
 		}.ToPlane()
-		isInside = isInside && p.DistanceToPoint(impact) > 0
+		isInside = isInside && p.DistanceToPoint(ir.PointOfImpact) > 0
 	}
-	return isInside, color, impact, normal
+	return gnr.InteractionResult{
+		Color:         gnr.ColorWhite,
+		PointOfImpact: ir.PointOfImpact,
+		Normal:        ir.Normal,
+		Distance:      gnr.VectorDifference(ir.PointOfImpact, r.Origin).Magnitude(),
+	}, isInside
 }

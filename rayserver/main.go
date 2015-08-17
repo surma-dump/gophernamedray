@@ -89,9 +89,7 @@ func main() {
 	fNormal := gnr.LerpCap(-1, 1, 0, 255)
 	for x := uint64(0); x < Width; x++ {
 		for y := uint64(0); y < Height; y++ {
-			hit, matColor, distance, normal := scene.TracePixel(x, y)
-
-			_, _, _, _ = hit, matColor, distance, normal
+			ir, hit := scene.TracePixel(x, y)
 
 			// Hit image
 			if hit {
@@ -100,9 +98,9 @@ func main() {
 
 			// Distance image
 			col := color.RGBA{
-				R: uint8(fFog(distance)),
-				G: uint8(fFog(distance)),
-				B: uint8(fFog(distance)),
+				R: uint8(fFog(ir.Distance)),
+				G: uint8(fFog(ir.Distance)),
+				B: uint8(fFog(ir.Distance)),
 				A: 255,
 			}
 			if hit {
@@ -111,9 +109,9 @@ func main() {
 
 			// Normal image
 			col = color.RGBA{
-				R: uint8(fNormal(normal.X)),
-				G: uint8(fNormal(normal.Y)),
-				B: uint8(fNormal(normal.Z)),
+				R: uint8(fNormal(ir.Normal.X)),
+				G: uint8(fNormal(ir.Normal.Y)),
+				B: uint8(fNormal(ir.Normal.Z)),
 				A: 255,
 			}
 			if hit {
