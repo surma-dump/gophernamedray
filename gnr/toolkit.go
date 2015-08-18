@@ -57,3 +57,30 @@ func (si *subimage) Set(x, y int, c color.Color) {
 	}
 	si.Image.Set(p.X, p.Y, c)
 }
+
+type ColorChanger struct {
+	Object
+	NewColor Color
+}
+
+func (cc ColorChanger) RayInteraction(r Ray) (InteractionResult, bool) {
+	ir, ok := cc.Object.RayInteraction(r)
+	ir.Color = cc.NewColor
+	return ir, ok
+}
+
+type XZChecker struct {
+	Object
+}
+
+func (cc XZChecker) RayInteraction(r Ray) (InteractionResult, bool) {
+	ir, ok := cc.Object.RayInteraction(r)
+	x := int(math.Floor(ir.PointOfImpact.X))
+	z := int(math.Floor(ir.PointOfImpact.Z))
+	if (x+z)%2 == 0 {
+		ir.Color = ColorBlack
+	} else {
+		ir.Color = ColorWhite
+	}
+	return ir, ok
+}

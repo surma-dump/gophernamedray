@@ -3,6 +3,9 @@ package gnr
 var (
 	ColorBlack = Color{0, 0, 0}
 	ColorWhite = Color{1.0, 1.0, 1.0}
+	ColorRed   = Color{1.0, 0.0, 0.0}
+	ColorGreen = Color{0.0, 1.0, 0.0}
+	ColorBlue  = Color{0.0, 0.0, 1.0}
 )
 
 type Color struct {
