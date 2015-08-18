@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"image"
 	"image/color"
 	"image/draw"
@@ -19,14 +20,6 @@ const (
 
 func main() {
 	scene := gnr.Scene{
-		Camera: gnr.Camera{
-			Position:      gnr.Vector3f{0, 0.5, -1},
-			PixelWidth:    Width,
-			PixelHeight:   Height,
-			VirtualWidth:  1,
-			VirtualHeight: 1,
-			Angle:         90.0,
-		},
 		Objects: []gnr.Object{
 			gnr.XZChecker{
 				Object: object.Plane{
@@ -79,6 +72,41 @@ func main() {
 		},
 	}
 
+	cameras := []gnr.Camera{
+		gnr.Camera{
+			Position:      gnr.Vector3f{0, 0.5, -1},
+			ViewDirection: gnr.Vector3f{0, 0, 1},
+			UpDirection:   gnr.Vector3f{0, 1, 0},
+			PixelWidth:    Width,
+			PixelHeight:   Height,
+			VirtualWidth:  1,
+			VirtualHeight: 1,
+			Angle:         60.0,
+		},
+		gnr.Camera{
+			Position:      gnr.Vector3f{0, 3, -4},
+			ViewDirection: gnr.Vector3f{0, -0.3, 1},
+			UpDirection:   gnr.Vector3f{0, 1, 0},
+			PixelWidth:    Width,
+			PixelHeight:   Height,
+			VirtualWidth:  1,
+			VirtualHeight: 1,
+			Angle:         60.0,
+		},
+	}
+	for idx, camera := range cameras {
+		scene.Camera = camera.Normalize()
+		img := renderImage(scene)
+		f, e := os.Create(fmt.Sprintf("image_%03d.png", idx))
+		if e != nil {
+			log.Fatalf("Could not open file for writing: %s\n", e)
+		}
+		defer f.Close()
+		png.Encode(f, img)
+	}
+}
+
+func renderImage(scene gnr.Scene) image.Image {
 	img := image.NewRGBA(image.Rectangle{
 		Min: image.Point{0, 0},
 		Max: image.Point{Width * 2, Height * 2},
@@ -136,11 +164,5 @@ func main() {
 			}
 		}
 	}
-
-	f, e := os.Create("image.png")
-	if e != nil {
-		log.Fatalf("Could not open file for writing: %s\n", e)
-	}
-	defer f.Close()
-	png.Encode(f, img)
+	return img
 }
