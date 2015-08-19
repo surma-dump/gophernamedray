@@ -26,34 +26,8 @@ func main() {
 					Normal:   gnr.Vector3f{0, 1, 0},
 					Distance: 0,
 				},
-			},
-			object.Triangle{
-				Points: [3]gnr.Vector3f{
-					gnr.Vector3f{-0.5, 3, 1},
-					gnr.Vector3f{0.5, 3, 1},
-					gnr.Vector3f{0, 4, 1},
-				},
-			},
-			object.Triangle{
-				Points: [3]gnr.Vector3f{
-					gnr.Vector3f{-1.5, 3, 1},
-					gnr.Vector3f{-0.5, 3, 1},
-					gnr.Vector3f{-1, 4, 1},
-				},
-			},
-			object.Triangle{
-				Points: [3]gnr.Vector3f{
-					gnr.Vector3f{0.5, 3, 1},
-					gnr.Vector3f{1.5, 3, 1},
-					gnr.Vector3f{1, 4, 1},
-				},
-			},
-			object.Triangle{
-				Points: [3]gnr.Vector3f{
-					gnr.Vector3f{-0.5, 4, 1},
-					gnr.Vector3f{0.5, 4, 1},
-					gnr.Vector3f{0, 5, 1},
-				},
+				ColorA: gnr.ColorRed,
+				ColorB: gnr.ColorBlack,
 			},
 			object.Triangle{
 				Points: [3]gnr.Vector3f{
@@ -62,19 +36,47 @@ func main() {
 					gnr.Vector3f{0, 2, 1},
 				},
 			},
+			object.Triangle{
+				Points: [3]gnr.Vector3f{
+					gnr.Vector3f{-1.5, 1, 1},
+					gnr.Vector3f{-0.5, 1, 1},
+					gnr.Vector3f{-1, 2, 1},
+				},
+			},
+			object.Triangle{
+				Points: [3]gnr.Vector3f{
+					gnr.Vector3f{0.5, 1, 1},
+					gnr.Vector3f{1.5, 1, 1},
+					gnr.Vector3f{1, 2, 1},
+				},
+			},
+			object.Triangle{
+				Points: [3]gnr.Vector3f{
+					gnr.Vector3f{-0.5, 2, 1},
+					gnr.Vector3f{0.5, 2, 1},
+					gnr.Vector3f{0, 3, 1},
+				},
+			},
+			object.Triangle{
+				Points: [3]gnr.Vector3f{
+					gnr.Vector3f{-0.5, 0, 1},
+					gnr.Vector3f{0.5, 0, 1},
+					gnr.Vector3f{0, 1, 1},
+				},
+			},
 			gnr.ColorChanger{
 				Object: object.Sphere{
 					Center: gnr.Vector3f{1, 1, 2},
 					Radius: 1,
 				},
-				NewColor: gnr.ColorRed,
+				NewColor: gnr.ColorBlue,
 			},
 		},
 	}
 
 	cameras := []gnr.Camera{
 		gnr.Camera{
-			Position:      gnr.Vector3f{0, 1, -2},
+			Position:      gnr.Vector3f{0, 1, -3},
 			ViewDirection: gnr.Vector3f{0, 0, 1},
 			UpDirection:   gnr.Vector3f{0, 1, 0},
 			PixelWidth:    Width,

@@ -31,5 +31,5 @@ func (p Plane) RayInteraction(r gnr.Ray) (gnr.InteractionResult, bool) {
 }
 
 func (p Plane) DistanceToPoint(pt gnr.Vector3f) float64 {
-	return gnr.VectorProduct(p.Normal.Normalize(), pt)
+	return gnr.VectorProduct(p.Normal.Normalize(), pt) + p.Distance
 }

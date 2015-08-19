@@ -71,6 +71,7 @@ func (cc ColorChanger) RayInteraction(r Ray) (InteractionResult, bool) {
 
 type XZChecker struct {
 	Object
+	ColorA, ColorB Color
 }
 
 func (cc XZChecker) RayInteraction(r Ray) (InteractionResult, bool) {
@@ -78,9 +79,9 @@ func (cc XZChecker) RayInteraction(r Ray) (InteractionResult, bool) {
 	x := int(math.Floor(ir.PointOfImpact.X))
 	z := int(math.Floor(ir.PointOfImpact.Z))
 	if (x+z)%2 == 0 {
-		ir.Color = ColorBlack
+		ir.Color = cc.ColorA
 	} else {
-		ir.Color = ColorWhite
+		ir.Color = cc.ColorB
 	}
 	return ir, ok
 }
