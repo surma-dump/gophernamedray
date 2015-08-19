@@ -95,6 +95,26 @@ func main() {
 				NewColor: gnr.ColorBlue,
 			},
 			gnr.ColorChanger{
+				Object: object.Triangle{
+					Points: [3]gnr.Vector3f{
+						gnr.Vector3f{-2, 2, 1},
+						gnr.Vector3f{0, 2, 1},
+						gnr.Vector3f{-1, 4, 1},
+					},
+				},
+				NewColor: gnr.ColorYellow,
+			},
+			gnr.ColorChanger{
+				Object: object.Triangle{
+					Points: [3]gnr.Vector3f{
+						gnr.Vector3f{2, 2, 1},
+						gnr.Vector3f{0, 2, 1},
+						gnr.Vector3f{1, 4, 1},
+					},
+				},
+				NewColor: gnr.ColorCyan,
+			},
+			gnr.ColorChanger{
 				Object: object.Sphere{
 					Center: gnr.Vector3f{1, 1, 1},
 					Radius: 1,
@@ -106,7 +126,7 @@ func main() {
 
 	cameras := []gnr.Camera{
 		gnr.Camera{
-			Position:      gnr.Vector3f{0, 1, -3},
+			Position:      gnr.Vector3f{0, 1, -5},
 			ViewDirection: gnr.Vector3f{0, 0, 1},
 			UpDirection:   gnr.Vector3f{0, 1, 0},
 			PixelWidth:    Width,
@@ -116,8 +136,8 @@ func main() {
 			Angle:         60.0,
 		},
 		gnr.Camera{
-			Position:      gnr.Vector3f{-1, 1, 3},
-			ViewDirection: gnr.Vector3f{1, 0, -1},
+			Position:      gnr.Vector3f{0, 1, 6},
+			ViewDirection: gnr.Vector3f{0, 0, -1},
 			UpDirection:   gnr.Vector3f{0, 1, 0},
 			PixelWidth:    Width,
 			PixelHeight:   Height,

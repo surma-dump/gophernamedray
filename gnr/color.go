@@ -1,11 +1,14 @@
 package gnr
 
 var (
-	ColorBlack = Color{0, 0, 0}
-	ColorWhite = Color{1.0, 1.0, 1.0}
-	ColorRed   = Color{1.0, 0.0, 0.0}
-	ColorGreen = Color{0.0, 1.0, 0.0}
-	ColorBlue  = Color{0.0, 0.0, 1.0}
+	ColorBlack   = Color{0, 0, 0}
+	ColorWhite   = Color{1.0, 1.0, 1.0}
+	ColorRed     = Color{1.0, 0.0, 0.0}
+	ColorYellow  = Color{1.0, 1.0, 0.0}
+	ColorGreen   = Color{0.0, 1.0, 0.0}
+	ColorCyan    = Color{0.0, 1.0, 1.0}
+	ColorBlue    = Color{0.0, 0.0, 1.0}
+	ColorMagenta = Color{1.0, 0.0, 1.0}
 )
 
 type Color struct {
