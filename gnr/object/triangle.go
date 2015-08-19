@@ -9,9 +9,6 @@ type Triangle struct {
 	Points [3]gnr.Vector3f
 }
 
-func (t Triangle) Normalize() {
-}
-
 func (t Triangle) ToPlane() Plane {
 	v1 := gnr.VectorDifference(t.Points[1], t.Points[0])
 	v2 := gnr.VectorDifference(t.Points[2], t.Points[0])

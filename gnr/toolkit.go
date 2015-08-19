@@ -85,3 +85,11 @@ func (cc XZChecker) RayInteraction(r Ray) (InteractionResult, bool) {
 	}
 	return ir, ok
 }
+
+type Disable struct {
+	Object
+}
+
+func (d Disable) RayInteraction(r Ray) (InteractionResult, bool) {
+	return InteractionResult{}, false
+}

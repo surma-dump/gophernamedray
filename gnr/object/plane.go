@@ -12,10 +12,6 @@ type Plane struct {
 	Distance float64
 }
 
-func (p Plane) Normalize() {
-	p.Normal = p.Normal.Normalize()
-}
-
 func (p Plane) RayInteraction(r gnr.Ray) (gnr.InteractionResult, bool) {
 	// Ray: {P | P = r.Origin + t * r.Direction}
 	// Plane: {P | P * p.Normal + p.Distance = 0}

@@ -11,9 +11,6 @@ type Sphere struct {
 	Radius float64
 }
 
-func (s Sphere) Normalize() {
-}
-
 func (s Sphere) RayInteraction(r gnr.Ray) (gnr.InteractionResult, bool) {
 	// Ray: {P | P = r.Origin + t * r.Direction}
 	// Sphere: {P | mag(P - s.Center)^2 - s.Radius^2 = 0}
