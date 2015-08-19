@@ -74,7 +74,7 @@ func main() {
 
 	cameras := []gnr.Camera{
 		gnr.Camera{
-			Position:      gnr.Vector3f{0, 0.5, -1},
+			Position:      gnr.Vector3f{0, 1, -2},
 			ViewDirection: gnr.Vector3f{0, 0, 1},
 			UpDirection:   gnr.Vector3f{0, 1, 0},
 			PixelWidth:    Width,
@@ -84,8 +84,18 @@ func main() {
 			Angle:         60.0,
 		},
 		gnr.Camera{
-			Position:      gnr.Vector3f{0, 3, -4},
+			Position:      gnr.Vector3f{0, 1, -2},
 			ViewDirection: gnr.Vector3f{0, -0.3, 1},
+			UpDirection:   gnr.Vector3f{0, 1, 0},
+			PixelWidth:    Width,
+			PixelHeight:   Height,
+			VirtualWidth:  1,
+			VirtualHeight: 1,
+			Angle:         60.0,
+		},
+		gnr.Camera{
+			Position:      gnr.Vector3f{3, 3, -1},
+			ViewDirection: gnr.Vector3f{-3, -3, 3},
 			UpDirection:   gnr.Vector3f{0, 1, 0},
 			PixelWidth:    Width,
 			PixelHeight:   Height,

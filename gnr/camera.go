@@ -17,8 +17,8 @@ type Camera struct {
 
 func (c Camera) Normalize() Camera {
 	c.ViewDirection = c.ViewDirection.Normalize()
-	side := VectorCross(c.ViewDirection, c.UpDirection)
-	c.UpDirection = VectorCross(side, c.ViewDirection).Normalize()
+	side := VectorCross(c.UpDirection, c.ViewDirection)
+	c.UpDirection = VectorCross(c.ViewDirection, side).Normalize()
 	return c
 }
 
