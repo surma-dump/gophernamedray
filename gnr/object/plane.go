@@ -1,6 +1,8 @@
 package object
 
 import (
+	"math"
+
 	"github.com/surma-dump/gophernamedray/gnr"
 )
 
@@ -33,7 +35,7 @@ func (p Plane) RayInteraction(r gnr.Ray) ([]gnr.InteractionResult, bool) {
 }
 
 func (p Plane) DistanceToPoint(pt gnr.Vector3f) float64 {
-	return gnr.VectorProduct(p.Normal.Normalize(), pt) + p.Distance
+	return math.Abs(gnr.VectorProduct(p.Normal.Normalize(), pt) + p.Distance)
 }
 
 func (p Plane) Contains(pt gnr.Vector3f) bool {
