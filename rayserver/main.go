@@ -22,104 +22,114 @@ const (
 
 func main() {
 	scene := gnr.Scene{
-		Objects: []gnr.Object{
-			gnr.XZChecker{
-				Object: object.Plane{
-					Normal:   gnr.Vector3f{0, 1, 0},
-					Distance: 0,
-				},
-				ColorA: gnr.ColorWhite,
-				ColorB: gnr.ColorBlack,
-			},
-			gnr.ColorChanger{
-				Object: gnr.Union{
+		Object: gnr.Layers{
+			Objects: []gnr.Object{
+				gnr.Union{
 					Objects: []gnr.Object{
-						object.Triangle{
-							Points: [3]gnr.Vector3f{
-								gnr.Vector3f{0, -AxisHeads, 0},
-								gnr.Vector3f{1, 0, 0},
-								gnr.Vector3f{0, AxisHeads, 0},
+						gnr.ColorChanger{
+							Object: gnr.Union{
+								Objects: []gnr.Object{
+									object.Triangle{
+										Points: [3]gnr.Vector3f{
+											gnr.Vector3f{0, -AxisHeads, 0},
+											gnr.Vector3f{1, 0, 0},
+											gnr.Vector3f{0, AxisHeads, 0},
+										},
+									},
+									object.Triangle{
+										Points: [3]gnr.Vector3f{
+											gnr.Vector3f{0, 0, -AxisHeads},
+											gnr.Vector3f{1, 0, 0},
+											gnr.Vector3f{0, 0, AxisHeads},
+										},
+									},
+								},
 							},
+							NewColor: gnr.ColorRed,
 						},
-						object.Triangle{
-							Points: [3]gnr.Vector3f{
-								gnr.Vector3f{0, 0, -AxisHeads},
-								gnr.Vector3f{1, 0, 0},
-								gnr.Vector3f{0, 0, AxisHeads},
+						gnr.ColorChanger{
+							Object: gnr.Union{
+								Objects: []gnr.Object{
+									object.Triangle{
+										Points: [3]gnr.Vector3f{
+											gnr.Vector3f{-AxisHeads, 0, 0},
+											gnr.Vector3f{AxisHeads, 0, 0},
+											gnr.Vector3f{0, 1, 0},
+										},
+									},
+									object.Triangle{
+										Points: [3]gnr.Vector3f{
+											gnr.Vector3f{0, 0, -AxisHeads},
+											gnr.Vector3f{0, 0, AxisHeads},
+											gnr.Vector3f{0, 1, 0},
+										},
+									},
+								},
 							},
+							NewColor: gnr.ColorGreen,
+						},
+						gnr.ColorChanger{
+							Object: gnr.Union{
+								Objects: []gnr.Object{
+									object.Triangle{
+										Points: [3]gnr.Vector3f{
+											gnr.Vector3f{-AxisHeads, 0, 0},
+											gnr.Vector3f{AxisHeads, 0, 0},
+											gnr.Vector3f{0, 0, 1},
+										},
+									},
+									object.Triangle{
+										Points: [3]gnr.Vector3f{
+											gnr.Vector3f{0, -AxisHeads, 0},
+											gnr.Vector3f{0, 0, 1},
+											gnr.Vector3f{0, AxisHeads, 0},
+										},
+									},
+								},
+							},
+							NewColor: gnr.ColorBlue,
 						},
 					},
 				},
-				NewColor: gnr.ColorRed,
-			},
-			gnr.ColorChanger{
-				Object: gnr.Union{
+				gnr.Union{
 					Objects: []gnr.Object{
-						object.Triangle{
-							Points: [3]gnr.Vector3f{
-								gnr.Vector3f{-AxisHeads, 0, 0},
-								gnr.Vector3f{AxisHeads, 0, 0},
-								gnr.Vector3f{0, 1, 0},
+						gnr.XZChecker{
+							Object: object.Plane{
+								Normal:   gnr.Vector3f{0, 1, 0},
+								Distance: 0,
 							},
+							ColorA: gnr.ColorWhite,
+							ColorB: gnr.ColorBlack,
 						},
-						object.Triangle{
-							Points: [3]gnr.Vector3f{
-								gnr.Vector3f{0, 0, -AxisHeads},
-								gnr.Vector3f{0, 0, AxisHeads},
-								gnr.Vector3f{0, 1, 0},
+						gnr.ColorChanger{
+							Object: object.Triangle{
+								Points: [3]gnr.Vector3f{
+									gnr.Vector3f{-2, 2, 1},
+									gnr.Vector3f{0, 2, 1},
+									gnr.Vector3f{-1, 4, 1},
+								},
 							},
+							NewColor: gnr.ColorYellow,
+						},
+						gnr.ColorChanger{
+							Object: object.Triangle{
+								Points: [3]gnr.Vector3f{
+									gnr.Vector3f{2, 2, 1},
+									gnr.Vector3f{0, 2, 1},
+									gnr.Vector3f{1, 4, 1},
+								},
+							},
+							NewColor: gnr.ColorCyan,
+						},
+						gnr.ColorChanger{
+							Object: object.Sphere{
+								Center: gnr.Vector3f{1, 1, 1},
+								Radius: 1,
+							},
+							NewColor: gnr.ColorBlue,
 						},
 					},
 				},
-				NewColor: gnr.ColorGreen,
-			},
-			gnr.ColorChanger{
-				Object: gnr.Union{
-					Objects: []gnr.Object{
-						object.Triangle{
-							Points: [3]gnr.Vector3f{
-								gnr.Vector3f{-AxisHeads, 0, 0},
-								gnr.Vector3f{AxisHeads, 0, 0},
-								gnr.Vector3f{0, 0, 1},
-							},
-						},
-						object.Triangle{
-							Points: [3]gnr.Vector3f{
-								gnr.Vector3f{0, -AxisHeads, 0},
-								gnr.Vector3f{0, 0, 1},
-								gnr.Vector3f{0, AxisHeads, 0},
-							},
-						},
-					},
-				},
-				NewColor: gnr.ColorBlue,
-			},
-			gnr.ColorChanger{
-				Object: object.Triangle{
-					Points: [3]gnr.Vector3f{
-						gnr.Vector3f{-2, 2, 1},
-						gnr.Vector3f{0, 2, 1},
-						gnr.Vector3f{-1, 4, 1},
-					},
-				},
-				NewColor: gnr.ColorYellow,
-			},
-			gnr.ColorChanger{
-				Object: object.Triangle{
-					Points: [3]gnr.Vector3f{
-						gnr.Vector3f{2, 2, 1},
-						gnr.Vector3f{0, 2, 1},
-						gnr.Vector3f{1, 4, 1},
-					},
-				},
-				NewColor: gnr.ColorCyan,
-			},
-			gnr.ColorChanger{
-				Object: object.Sphere{
-					Center: gnr.Vector3f{1, 1, 1},
-					Radius: 1,
-				},
-				NewColor: gnr.ColorBlue,
 			},
 		},
 	}

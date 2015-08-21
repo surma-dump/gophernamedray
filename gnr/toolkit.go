@@ -93,3 +93,17 @@ type Disable struct {
 func (d Disable) RayInteraction(r Ray) (InteractionResult, bool) {
 	return InteractionResult{}, false
 }
+
+type Layers struct {
+	Objects []Object
+}
+
+func (l Layers) RayInteraction(r Ray) (InteractionResult, bool) {
+	for _, o := range l.Objects {
+		ir, ok := o.RayInteraction(r)
+		if ok {
+			return ir, ok
+		}
+	}
+	return InteractionResult{}, false
+}
