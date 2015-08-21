@@ -98,6 +98,10 @@ type Layers struct {
 	Objects []Object
 }
 
+func NewLayers(o ...Object) Layers {
+	return Layers{o}
+}
+
 func (l Layers) RayInteraction(r Ray) (InteractionResult, bool) {
 	for _, o := range l.Objects {
 		ir, ok := o.RayInteraction(r)
