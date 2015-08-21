@@ -1,6 +1,9 @@
 package object
 
 import (
+	"fmt"
+	"math"
+
 	"github.com/surma-dump/gophernamedray/gnr"
 )
 
@@ -12,30 +15,53 @@ type Triangle struct {
 func (t Triangle) ToPlane() Plane {
 	v1 := gnr.VectorDifference(t.Points[1], t.Points[0])
 	v2 := gnr.VectorDifference(t.Points[2], t.Points[0])
-	normal := gnr.VectorCross(v1, v2).Normalize()
+	normal := gnr.VectorCross(v1, v2)
 	return Plane{
 		Normal:   normal,
-		Distance: -gnr.VectorProduct(normal, t.Points[1]),
+		Distance: -gnr.VectorProduct(normal, t.Points[0]),
 	}
 }
 
+func (t Triangle) Contains(p gnr.Vector3f) bool {
+	tp := t.ToPlane()
+	na := Triangle{
+		Points: [3]gnr.Vector3f{t.Points[0], t.Points[1], p},
+	}.ToPlane().Normal
+	nb := Triangle{
+		Points: [3]gnr.Vector3f{t.Points[1], t.Points[2], p},
+	}.ToPlane().Normal
+	nc := Triangle{
+		Points: [3]gnr.Vector3f{t.Points[2], t.Points[0], p},
+	}.ToPlane().Normal
+
+	denom := math.Pow(tp.Normal.Magnitude(), 2)
+	ba := gnr.VectorProduct(tp.Normal, na) / denom
+	bb := gnr.VectorProduct(tp.Normal, nb) / denom
+	bc := gnr.VectorProduct(tp.Normal, nc) / denom
+
+	return ba >= 0 && ba <= 1 && bb >= 0 && bb <= 1 && bc >= 0 && bc <= 1
+}
+
+func (t Triangle) Area() float64 {
+	v1 := gnr.VectorDifference(t.Points[1], t.Points[0])
+	v2 := gnr.VectorDifference(t.Points[2], t.Points[0])
+	return gnr.VectorCross(v1, v2).Magnitude() / 2
+}
+
 func (t Triangle) RayInteraction(r gnr.Ray) (gnr.InteractionResult, bool) {
-	isInside := true
 	ir, ok := t.ToPlane().RayInteraction(r)
 	if !ok {
-		return gnr.InteractionResult{}, false
+		return ir, false
 	}
 
-	for i := 0; i < 3; i++ {
-		p := Triangle{
-			Points: [3]gnr.Vector3f{r.Origin, t.Points[i], t.Points[(i+1)%3]},
-		}.ToPlane()
-		isInside = isInside && p.DistanceToPoint(ir.PointOfImpact) > 0
-	}
 	return gnr.InteractionResult{
 		Color:         gnr.ColorWhite,
 		PointOfImpact: ir.PointOfImpact,
 		Normal:        ir.Normal,
 		Distance:      gnr.VectorDifference(ir.PointOfImpact, r.Origin).Magnitude(),
-	}, isInside
+	}, t.Contains(ir.PointOfImpact)
+}
+
+func (t Triangle) String() string {
+	return fmt.Sprintf("Triangle[%s, %s, %s]", t.Points[0], t.Points[1], t.Points[2])
 }

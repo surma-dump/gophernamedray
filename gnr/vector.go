@@ -18,15 +18,6 @@ func (v Vector3f) Normalize() Vector3f {
 	if m == 0 {
 		return v
 	}
-	// if v.X == -0.0 {
-	// 	v.X = 0
-	// }
-	// if v.Y == -0.0 {
-	// 	v.Y = 0
-	// }
-	// if v.Z == -0.0 {
-	// 	v.Z = 0
-	// }
 	return Vector3f{
 		X: v.X / m,
 		Y: v.Y / m,
