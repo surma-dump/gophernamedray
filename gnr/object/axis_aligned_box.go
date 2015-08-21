@@ -1,6 +1,8 @@
 package object
 
 import (
+	"math"
+
 	"github.com/surma-dump/gophernamedray/gnr"
 )
 
@@ -11,24 +13,24 @@ type AxisAlignedBox struct {
 func (aab AxisAlignedBox) RayInteraction(r gnr.Ray) []gnr.InteractionResult {
 	planes := []gnr.Object{
 		Plane{
-			Normal:   gnr.Vector3f{1, 0, 0},
-			Distance: -gnr.VectorProduct(gnr.Vector3f{1, 0, 0}, aab.Min),
+			Normal:   gnr.Vector3f{-1, 0, 0},
+			Distance: -gnr.VectorProduct(gnr.Vector3f{-1, 0, 0}, aab.Min),
 		},
 		Plane{
 			Normal:   gnr.Vector3f{1, 0, 0},
 			Distance: -gnr.VectorProduct(gnr.Vector3f{1, 0, 0}, aab.Max),
 		},
 		Plane{
-			Normal:   gnr.Vector3f{0, 1, 0},
-			Distance: -gnr.VectorProduct(gnr.Vector3f{0, 1, 0}, aab.Min),
+			Normal:   gnr.Vector3f{0, -1, 0},
+			Distance: -gnr.VectorProduct(gnr.Vector3f{0, -1, 0}, aab.Min),
 		},
 		Plane{
 			Normal:   gnr.Vector3f{0, 1, 0},
 			Distance: -gnr.VectorProduct(gnr.Vector3f{0, 1, 0}, aab.Max),
 		},
 		Plane{
-			Normal:   gnr.Vector3f{0, 0, 1},
-			Distance: -gnr.VectorProduct(gnr.Vector3f{0, 0, 1}, aab.Min),
+			Normal:   gnr.Vector3f{0, 0, -1},
+			Distance: -gnr.VectorProduct(gnr.Vector3f{0, 0, -1}, aab.Min),
 		},
 		Plane{
 			Normal:   gnr.Vector3f{0, 0, 1},
@@ -39,13 +41,13 @@ func (aab AxisAlignedBox) RayInteraction(r gnr.Ray) []gnr.InteractionResult {
 		newIrs := o.RayInteraction(r)
 		p := o.(Plane)
 		newIrs = gnr.InteractionResultSlice(newIrs).SelectInteractionResult(func(ir gnr.InteractionResult) gnr.InteractionResult {
-			if p.Normal.X == 1 {
+			if math.Abs(p.Normal.X) == 1 {
 				ir.PointOfImpact.X = -p.Distance
 			}
-			if p.Normal.Y == 1 {
+			if math.Abs(p.Normal.Y) == 1 {
 				ir.PointOfImpact.Y = -p.Distance
 			}
-			if p.Normal.Z == 1 {
+			if math.Abs(p.Normal.Z) == 1 {
 				ir.PointOfImpact.Z = -p.Distance
 			}
 			return ir
