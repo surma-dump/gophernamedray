@@ -9,7 +9,7 @@ import (
 var (
 	// Epsilon is used as a margin of error to compensate for IEEE 754
 	// inaccuracies.
-	Epsilon = 0.2
+	Epsilon = 0.001
 )
 
 // Plane models an infinite 2D plane in 3D space

@@ -96,9 +96,9 @@ func main() {
 				gnr.ColorChanger{
 					Object: object.Triangle{
 						Points: [3]gnr.Vector3f{
-							{-2, 2, 1},
-							{0, 2, 1},
-							{-1, 4, 1},
+							{-2, 2, 0},
+							{0, 2, 0},
+							{-1, 4, 0},
 						},
 					},
 					NewColor: gnr.ColorYellow,
@@ -106,26 +106,42 @@ func main() {
 				gnr.ColorChanger{
 					Object: object.Triangle{
 						Points: [3]gnr.Vector3f{
-							{2, 2, 1},
-							{0, 2, 1},
-							{1, 4, 1},
+							{2, 2, 0},
+							{0, 2, 0},
+							{1, 4, 0},
 						},
 					},
 					NewColor: gnr.ColorCyan,
 				},
 				gnr.ColorChanger{
 					Object: object.Sphere{
-						Center: gnr.Vector3f{1, 1, 1},
+						Center: gnr.Vector3f{1, 1, 0},
 						Radius: 1,
 					},
 					NewColor: gnr.ColorBlue,
 				},
+				gnr.NewIntersection(
+					gnr.ColorChanger{
+						Object: object.AxisAlignedBox{
+							Min: gnr.Vector3f{-1, 0.5, -0.5},
+							Max: gnr.Vector3f{0, 1.5, 0.5},
+						}.Normalize(),
+						NewColor: gnr.ColorRed,
+					},
+					gnr.ColorChanger{
+						Object: object.Sphere{
+							Center: gnr.Vector3f{-0.5, 1, 0},
+							Radius: 0.7,
+						},
+						NewColor: gnr.ColorGreen,
+					},
+				),
 				gnr.ColorChanger{
 					Object: object.AxisAlignedBox{
-						Min: gnr.Vector3f{-2, 0.5, 0},
-						Max: gnr.Vector3f{-1, 1.5, 1},
-					},
-					NewColor: gnr.ColorRed,
+						Min: gnr.Vector3f{-1.5, 0.5, -0.5},
+						Max: gnr.Vector3f{-2.5, 1.5, 0.5},
+					}.Normalize(),
+					NewColor: gnr.ColorMagenta,
 				},
 			), // Union
 		), // Layers
@@ -143,7 +159,7 @@ func main() {
 			Angle:         60.0,
 		},
 		gnr.Camera{
-			Position:      gnr.Vector3f{0, 1, 6},
+			Position:      gnr.Vector3f{0, 1, 5},
 			ViewDirection: gnr.Vector3f{0, 0, -1},
 			UpDirection:   gnr.Vector3f{0, 1, 0},
 			PixelWidth:    Width,
@@ -153,7 +169,7 @@ func main() {
 			Angle:         60.0,
 		},
 		gnr.Camera{
-			Position:      gnr.Vector3f{3, 3, -1},
+			Position:      gnr.Vector3f{3, 3, -3},
 			ViewDirection: gnr.Vector3f{-3, -3, 3},
 			UpDirection:   gnr.Vector3f{0, 1, 0},
 			PixelWidth:    Width,
