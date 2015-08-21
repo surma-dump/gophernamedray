@@ -22,129 +22,133 @@ const (
 
 func main() {
 	scene := gnr.Scene{
-		Object: gnr.NewLayers(
-			gnr.NewUnion(
-				gnr.ColorChanger{
-					Object: gnr.Union{
-						Objects: []gnr.Object{
+
+		Object: gnr.FlatShader{
+			Object: gnr.NewLayers(
+				gnr.NewUnion(
+					gnr.ColorChanger{
+						Object: gnr.Union{
+							Objects: []gnr.Object{
+								object.Triangle{
+									Points: [3]gnr.Vector3f{
+										{0, -AxisHeads, 0},
+										{1, 0, 0},
+										{0, AxisHeads, 0},
+									},
+								},
+								object.Triangle{
+									Points: [3]gnr.Vector3f{
+										{0, 0, -AxisHeads},
+										{1, 0, 0},
+										{0, 0, AxisHeads},
+									},
+								},
+							},
+						},
+						NewColor: gnr.ColorRed,
+					},
+					gnr.ColorChanger{
+						Object: gnr.NewUnion(
 							object.Triangle{
 								Points: [3]gnr.Vector3f{
-									{0, -AxisHeads, 0},
-									{1, 0, 0},
-									{0, AxisHeads, 0},
+									{-AxisHeads, 0, 0},
+									{AxisHeads, 0, 0},
+									{0, 1, 0},
 								},
 							},
 							object.Triangle{
 								Points: [3]gnr.Vector3f{
 									{0, 0, -AxisHeads},
-									{1, 0, 0},
 									{0, 0, AxisHeads},
+									{0, 1, 0},
 								},
 							},
-						},
+						),
+						NewColor: gnr.ColorGreen,
 					},
-					NewColor: gnr.ColorRed,
-				},
-				gnr.ColorChanger{
-					Object: gnr.NewUnion(
-						object.Triangle{
-							Points: [3]gnr.Vector3f{
-								{-AxisHeads, 0, 0},
-								{AxisHeads, 0, 0},
-								{0, 1, 0},
-							},
-						},
-						object.Triangle{
-							Points: [3]gnr.Vector3f{
-								{0, 0, -AxisHeads},
-								{0, 0, AxisHeads},
-								{0, 1, 0},
-							},
-						},
-					),
-					NewColor: gnr.ColorGreen,
-				},
-				gnr.ColorChanger{
-					Object: gnr.NewUnion(
-						object.Triangle{
-							Points: [3]gnr.Vector3f{
-								{-AxisHeads, 0, 0},
-								{AxisHeads, 0, 0},
-								{0, 0, 1},
-							},
-						},
-						object.Triangle{
-							Points: [3]gnr.Vector3f{
-								{0, -AxisHeads, 0},
-								{0, 0, 1},
-								{0, AxisHeads, 0},
-							},
-						},
-					),
-					NewColor: gnr.ColorBlue,
-				},
-			), // Union
-			gnr.NewUnion(
-				gnr.XZChecker{
-					Object: object.Plane{
-						Normal:   gnr.Vector3f{0, 1, 0},
-						Distance: 0,
-					},
-					ColorA: gnr.ColorWhite,
-					ColorB: gnr.ColorBlack,
-				},
-				gnr.ColorChanger{
-					Object: object.Triangle{
-						Points: [3]gnr.Vector3f{
-							{-2, 2, 0},
-							{0, 2, 0},
-							{-1, 4, 0},
-						},
-					},
-					NewColor: gnr.ColorYellow,
-				},
-				gnr.ColorChanger{
-					Object: object.Triangle{
-						Points: [3]gnr.Vector3f{
-							{2, 2, 0},
-							{0, 2, 0},
-							{1, 4, 0},
-						},
-					},
-					NewColor: gnr.ColorCyan,
-				},
-				gnr.ColorChanger{
-					Object: object.Sphere{
-						Center: gnr.Vector3f{1, 1, 0},
-						Radius: 1,
-					},
-					NewColor: gnr.ColorBlue,
-				},
-				gnr.NewIntersection(
 					gnr.ColorChanger{
-						Object: object.AxisAlignedBox{
-							Min: gnr.Vector3f{-1, 0.5, -0.5},
-							Max: gnr.Vector3f{0, 1.5, 0.5},
-						}.Normalize(),
-						NewColor: gnr.ColorRed,
+						Object: gnr.NewUnion(
+							object.Triangle{
+								Points: [3]gnr.Vector3f{
+									{-AxisHeads, 0, 0},
+									{AxisHeads, 0, 0},
+									{0, 0, 1},
+								},
+							},
+							object.Triangle{
+								Points: [3]gnr.Vector3f{
+									{0, -AxisHeads, 0},
+									{0, 0, 1},
+									{0, AxisHeads, 0},
+								},
+							},
+						),
+						NewColor: gnr.ColorBlue,
+					},
+				), // Union
+				gnr.NewUnion(
+					gnr.XZChecker{
+						Object: object.Plane{
+							Normal:   gnr.Vector3f{0, 1, 0},
+							Distance: 0,
+						},
+						ColorA: gnr.ColorWhite,
+						ColorB: gnr.ColorBlack,
+					},
+					gnr.ColorChanger{
+						Object: object.Triangle{
+							Points: [3]gnr.Vector3f{
+								{-2, 2, 0},
+								{0, 2, 0},
+								{-1, 4, 0},
+							},
+						},
+						NewColor: gnr.ColorYellow,
+					},
+					gnr.ColorChanger{
+						Object: object.Triangle{
+							Points: [3]gnr.Vector3f{
+								{2, 2, 0},
+								{0, 2, 0},
+								{1, 4, 0},
+							},
+						},
+						NewColor: gnr.ColorCyan,
 					},
 					gnr.ColorChanger{
 						Object: object.Sphere{
-							Center: gnr.Vector3f{-0.5, 1, 0},
-							Radius: 0.7,
+							Center: gnr.Vector3f{1, 1, 0},
+							Radius: 1,
 						},
-						NewColor: gnr.ColorGreen,
+						NewColor: gnr.ColorBlue,
 					},
-				),
-				gnr.ColorChanger{
-					Object: object.AxisAlignedBox{
-						Min: gnr.Vector3f{-1.5, 0.5, -0.5},
-						Max: gnr.Vector3f{-2.5, 1.5, 0.5},
-					}.Normalize(),
-					NewColor: gnr.ColorMagenta,
-				},
-			), // Union
-		), // Layers
+					gnr.NewIntersection(
+						gnr.ColorChanger{
+							Object: object.AxisAlignedBox{
+								Min: gnr.Vector3f{-1, 0.5, -0.5},
+								Max: gnr.Vector3f{0, 1.5, 0.5},
+							}.Normalize(),
+							NewColor: gnr.ColorRed,
+						},
+						gnr.ColorChanger{
+							Object: object.Sphere{
+								Center: gnr.Vector3f{-0.5, 1, 0},
+								Radius: 0.7,
+							},
+							NewColor: gnr.ColorGreen,
+						},
+					),
+					gnr.ColorChanger{
+						Object: object.AxisAlignedBox{
+							Min: gnr.Vector3f{-1.5, 0.5, -0.5},
+							Max: gnr.Vector3f{-2.5, 1.5, 0.5},
+						}.Normalize(),
+						NewColor: gnr.ColorMagenta,
+					},
+				), // Union
+			), // Layers
+			FalloffFunc: gnr.NewLinearFalloffFunc(gnr.Vector3f{-3, -5, 1}),
+		}, // FlatShader
 	}
 
 	cameras := []gnr.Camera{

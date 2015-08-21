@@ -25,6 +25,27 @@ func LerpCap(inMin, inMax, outMin, outMax float64) func(d float64) float64 {
 	}
 }
 
+// VLerp is the same as Lerp but for Vector3f.
+func VLerp(inMin, inMax float64, outMin, outMax Vector3f) func(d float64) Vector3f {
+	xLerp := Lerp(inMin, inMax, outMin.X, outMax.X)
+	yLerp := Lerp(inMin, inMax, outMin.Y, outMax.Y)
+	zLerp := Lerp(inMin, inMax, outMin.Z, outMax.Z)
+	return func(d float64) Vector3f {
+		return Vector3f{xLerp(d), yLerp(d), zLerp(d)}
+	}
+}
+
+// VLerpCap is the same as VLerp but caps the input to be in between
+// inMin and inMax.
+func VLerpCap(inMin, inMax float64, outMin, outMax Vector3f) func(d float64) Vector3f {
+	xLerp := LerpCap(inMin, inMax, outMin.X, outMax.X)
+	yLerp := LerpCap(inMin, inMax, outMin.Y, outMax.Y)
+	zLerp := LerpCap(inMin, inMax, outMin.Z, outMax.Z)
+	return func(d float64) Vector3f {
+		return Vector3f{xLerp(d), yLerp(d), zLerp(d)}
+	}
+}
+
 // SubImage extracts a rectangular subset of draw.Image as a separate draw.Image
 // with a translated origin to the rectangles canonicalized Min point.
 func SubImage(img draw.Image, r image.Rectangle) draw.Image {
