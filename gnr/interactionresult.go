@@ -2,7 +2,7 @@ package gnr
 
 // +gen slice:"SortBy,Where,Select[string],Select[InteractionResult]"
 type InteractionResult struct {
-	Color                 Color
+	Color                 Vector3f
 	PointOfImpact, Normal Vector3f
 	Distance              float64
 }

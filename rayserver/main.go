@@ -205,7 +205,6 @@ func renderImage(scene gnr.Scene) image.Image {
 
 	fFog := gnr.LerpCap(0, 15, 255, 0)
 	fNormal := gnr.LerpCap(-1, 1, 0, 255)
-	fColor := gnr.LerpCap(0, 1, 0, 255)
 	for x := uint64(0); x < Width; x++ {
 		for y := uint64(0); y < Height; y++ {
 			ir, hit := scene.TracePixel(x, y)
@@ -237,15 +236,8 @@ func renderImage(scene gnr.Scene) image.Image {
 				normImg.Set(int(x), int(y), col)
 			}
 
-			// Color image
-			col = color.RGBA{
-				R: uint8(fColor(ir.Color.R)),
-				G: uint8(fColor(ir.Color.G)),
-				B: uint8(fColor(ir.Color.B)),
-				A: 255,
-			}
 			if hit {
-				colImg.Set(int(x), int(y), col)
+				colImg.Set(int(x), int(y), ir.Color.ToColor())
 			}
 		}
 	}

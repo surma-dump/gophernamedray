@@ -1,35 +1,27 @@
 package gnr
 
-var (
-	ColorBlack   = Color{0, 0, 0}
-	ColorWhite   = Color{1.0, 1.0, 1.0}
-	ColorRed     = Color{1.0, 0.0, 0.0}
-	ColorYellow  = Color{1.0, 1.0, 0.0}
-	ColorGreen   = Color{0.0, 1.0, 0.0}
-	ColorCyan    = Color{0.0, 1.0, 1.0}
-	ColorBlue    = Color{0.0, 0.0, 1.0}
-	ColorMagenta = Color{1.0, 0.0, 1.0}
+import (
+	"image/color"
 )
 
-type Color struct {
-	R, G, B float64
-}
+var (
+	ColorBlack   = Vector3f{0, 0, 0}
+	ColorWhite   = Vector3f{1.0, 1.0, 1.0}
+	ColorRed     = Vector3f{1.0, 0.0, 0.0}
+	ColorYellow  = Vector3f{1.0, 1.0, 0.0}
+	ColorGreen   = Vector3f{0.0, 1.0, 0.0}
+	ColorCyan    = Vector3f{0.0, 1.0, 1.0}
+	ColorBlue    = Vector3f{0.0, 0.0, 1.0}
+	ColorMagenta = Vector3f{1.0, 0.0, 1.0}
+)
 
-func (c Color) Normalize() {
-	if c.R < 0 {
-		c.R = 0
+var fColor = LerpCap(0, 1, 0, 255)
+
+func (v Vector3f) ToColor() color.Color {
+	return color.RGBA{
+		R: uint8(fColor(v.X)),
+		G: uint8(fColor(v.Y)),
+		B: uint8(fColor(v.Z)),
+		A: 255,
 	}
-	if c.G < 0 {
-		c.G = 0
-	}
-	if c.B < 0 {
-		c.B = 0
-	}
-	Sum := c.R + c.G + c.G
-	if Sum == 0 {
-		return
-	}
-	c.R /= Sum
-	c.G /= Sum
-	c.B /= Sum
 }

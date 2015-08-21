@@ -61,7 +61,7 @@ func (si *subimage) Set(x, y int, c color.Color) {
 
 type ColorChanger struct {
 	Object
-	NewColor Color
+	NewColor Vector3f
 }
 
 func (cc ColorChanger) RayInteraction(r Ray) []InteractionResult {
@@ -74,7 +74,7 @@ func (cc ColorChanger) RayInteraction(r Ray) []InteractionResult {
 
 type XZChecker struct {
 	Object
-	ColorA, ColorB Color
+	ColorA, ColorB Vector3f
 }
 
 func (cc XZChecker) RayInteraction(r Ray) []InteractionResult {
