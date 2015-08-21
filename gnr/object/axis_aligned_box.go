@@ -40,6 +40,19 @@ func (aab AxisAlignedBox) RayInteraction(r gnr.Ray) ([]gnr.InteractionResult, bo
 		if !ok {
 			return irs
 		}
+		p := o.(Plane)
+		newIrs = gnr.InteractionResultSlice(newIrs).SelectInteractionResult(func(ir gnr.InteractionResult) gnr.InteractionResult {
+			if p.Normal.X == 1 {
+				ir.PointOfImpact.X = -p.Distance
+			}
+			if p.Normal.Y == 1 {
+				ir.PointOfImpact.Y = -p.Distance
+			}
+			if p.Normal.Z == 1 {
+				ir.PointOfImpact.Z = -p.Distance
+			}
+			return ir
+		})
 		return append(irs, newIrs...)
 	})
 	irs = gnr.InteractionResultSlice(irs).Where(func(ir gnr.InteractionResult) bool {
