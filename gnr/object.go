@@ -1,6 +1,6 @@
 package gnr
 
-// +gen slice:"Aggregate[InteractionResult],Select[InteractionResult]"
+// +gen slice:"Aggregate[InteractionResult],Aggregate[[]InteractionResult]"
 type Object interface {
-	RayInteraction(r Ray) (ir InteractionResult, didHit bool)
+	RayInteraction(r Ray) (ir []InteractionResult, didHit bool)
 }

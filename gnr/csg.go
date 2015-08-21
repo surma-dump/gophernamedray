@@ -8,22 +8,20 @@ func NewUnion(o ...Object) Union {
 	return Union{o}
 }
 
-func (u Union) RayInteraction(r Ray) (InteractionResult, bool) {
+func (u Union) RayInteraction(r Ray) ([]InteractionResult, bool) {
 	didHitSomething := false
 	// Check ray interaction with all objects, only return the one closes to the origin
-	ir := ObjectSlice(u.Objects).AggregateInteractionResult(func(ir InteractionResult, o Object) InteractionResult {
-		newIr, ok := o.RayInteraction(r)
+	irs := ObjectSlice(u.Objects).AggregateSliceInteractionResult(func(irs []InteractionResult, o Object) []InteractionResult {
+		newIrs, ok := o.RayInteraction(r)
 		if !ok {
-			return ir
+			return irs
 		}
-		if !didHitSomething || newIr.Distance < ir.Distance {
-			didHitSomething = true
-			return newIr
-		}
-		return ir
+		didHitSomething = true
+		irs = append(irs, newIrs...)
+		return irs
 	})
 	if !didHitSomething {
-		return InteractionResult{}, false
+		return []InteractionResult{}, false
 	}
-	return ir, true
+	return InteractionResultSlice(irs).SortBy(InteractionResultDistance), true
 }

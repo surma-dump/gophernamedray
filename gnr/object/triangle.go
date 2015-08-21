@@ -48,18 +48,18 @@ func (t Triangle) Area() float64 {
 	return gnr.VectorCross(v1, v2).Magnitude() / 2
 }
 
-func (t Triangle) RayInteraction(r gnr.Ray) (gnr.InteractionResult, bool) {
+func (t Triangle) RayInteraction(r gnr.Ray) ([]gnr.InteractionResult, bool) {
 	ir, ok := t.ToPlane().RayInteraction(r)
 	if !ok {
-		return ir, false
+		return []gnr.InteractionResult{}, false
 	}
 
-	return gnr.InteractionResult{
+	return []gnr.InteractionResult{{
 		Color:         gnr.ColorWhite,
-		PointOfImpact: ir.PointOfImpact,
-		Normal:        ir.Normal,
-		Distance:      gnr.VectorDifference(ir.PointOfImpact, r.Origin).Magnitude(),
-	}, t.Contains(ir.PointOfImpact)
+		PointOfImpact: ir[0].PointOfImpact,
+		Normal:        ir[0].Normal,
+		Distance:      gnr.VectorDifference(ir[0].PointOfImpact, r.Origin).Magnitude(),
+	}}, t.Contains(ir[0].PointOfImpact)
 }
 
 func (t Triangle) String() string {

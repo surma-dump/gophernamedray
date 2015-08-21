@@ -63,10 +63,12 @@ type ColorChanger struct {
 	NewColor Color
 }
 
-func (cc ColorChanger) RayInteraction(r Ray) (InteractionResult, bool) {
-	ir, ok := cc.Object.RayInteraction(r)
-	ir.Color = cc.NewColor
-	return ir, ok
+func (cc ColorChanger) RayInteraction(r Ray) ([]InteractionResult, bool) {
+	irs, ok := cc.Object.RayInteraction(r)
+	for i := range irs {
+		irs[i].Color = cc.NewColor
+	}
+	return irs, ok
 }
 
 type XZChecker struct {
@@ -74,24 +76,26 @@ type XZChecker struct {
 	ColorA, ColorB Color
 }
 
-func (cc XZChecker) RayInteraction(r Ray) (InteractionResult, bool) {
-	ir, ok := cc.Object.RayInteraction(r)
-	x := int(math.Floor(ir.PointOfImpact.X))
-	z := int(math.Floor(ir.PointOfImpact.Z))
-	if (x+z)%2 == 0 {
-		ir.Color = cc.ColorA
-	} else {
-		ir.Color = cc.ColorB
+func (cc XZChecker) RayInteraction(r Ray) ([]InteractionResult, bool) {
+	irs, ok := cc.Object.RayInteraction(r)
+	for i := range irs {
+		x := int(math.Floor(irs[i].PointOfImpact.X))
+		z := int(math.Floor(irs[i].PointOfImpact.Z))
+		if (x+z)%2 == 0 {
+			irs[i].Color = cc.ColorA
+		} else {
+			irs[i].Color = cc.ColorB
+		}
 	}
-	return ir, ok
+	return irs, ok
 }
 
 type Disable struct {
 	Object
 }
 
-func (d Disable) RayInteraction(r Ray) (InteractionResult, bool) {
-	return InteractionResult{}, false
+func (d Disable) RayInteraction(r Ray) ([]InteractionResult, bool) {
+	return []InteractionResult{}, false
 }
 
 type Layers struct {
@@ -102,12 +106,12 @@ func NewLayers(o ...Object) Layers {
 	return Layers{o}
 }
 
-func (l Layers) RayInteraction(r Ray) (InteractionResult, bool) {
+func (l Layers) RayInteraction(r Ray) ([]InteractionResult, bool) {
 	for _, o := range l.Objects {
-		ir, ok := o.RayInteraction(r)
+		irs, ok := o.RayInteraction(r)
 		if ok {
-			return ir, ok
+			return irs, ok
 		}
 	}
-	return InteractionResult{}, false
+	return []InteractionResult{}, false
 }

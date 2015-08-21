@@ -11,7 +11,7 @@ type Sphere struct {
 	Radius float64
 }
 
-func (s Sphere) RayInteraction(r gnr.Ray) (gnr.InteractionResult, bool) {
+func (s Sphere) RayInteraction(r gnr.Ray) ([]gnr.InteractionResult, bool) {
 	// Ray: {P | P = r.Origin + t * r.Direction}
 	// Sphere: {P | mag(P - s.Center)^2 - s.Radius^2 = 0}
 	// subsitution
@@ -21,7 +21,7 @@ func (s Sphere) RayInteraction(r gnr.Ray) (gnr.InteractionResult, bool) {
 	p2 := math.Pow(p, 2)
 	inSqrt := p2/4 - q
 	if inSqrt < 0 {
-		return gnr.InteractionResult{}, false
+		return []gnr.InteractionResult{}, false
 	}
 	sqrt := math.Sqrt(inSqrt)
 
@@ -29,18 +29,20 @@ func (s Sphere) RayInteraction(r gnr.Ray) (gnr.InteractionResult, bool) {
 	t2 := -p/2 - sqrt
 	P1 := gnr.VectorSum(r.Origin, r.Direction.Multiply(t1))
 	P2 := gnr.VectorSum(r.Origin, r.Direction.Multiply(t2))
-	d1 := gnr.VectorDifference(r.Origin, P1).Magnitude()
-	d2 := gnr.VectorDifference(r.Origin, P2).Magnitude()
 	ir := gnr.InteractionResult{
 		Color: gnr.ColorWhite,
 	}
-	if d1 <= d2 {
-		ir.PointOfImpact = P1
-		ir.Normal = gnr.VectorDifference(P1, s.Center).Normalize()
-	} else {
-		ir.PointOfImpact = P2
-		ir.Normal = gnr.VectorDifference(P2, s.Center).Normalize()
+
+	irs := make([]gnr.InteractionResult, 0, 2)
+	irs = append(irs, ir)
+	irs[0].PointOfImpact = P1
+	irs[0].Normal = gnr.VectorDifference(P1, s.Center).Normalize()
+	irs[0].Distance = gnr.VectorDifference(P1, r.Origin).Magnitude()
+	if inSqrt != 0 {
+		irs = append(irs, ir)
+		irs[1].PointOfImpact = P2
+		irs[1].Normal = gnr.VectorDifference(P2, s.Center).Normalize()
+		irs[1].Distance = gnr.VectorDifference(P2, r.Origin).Magnitude()
 	}
-	ir.Distance = gnr.VectorDifference(ir.PointOfImpact, r.Origin).Magnitude()
-	return ir, true
+	return irs, true
 }
