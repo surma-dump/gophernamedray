@@ -64,12 +64,12 @@ type ColorChanger struct {
 	NewColor Color
 }
 
-func (cc ColorChanger) RayInteraction(r Ray) ([]InteractionResult, bool) {
-	irs, ok := cc.Object.RayInteraction(r)
+func (cc ColorChanger) RayInteraction(r Ray) []InteractionResult {
+	irs := cc.Object.RayInteraction(r)
 	for i := range irs {
 		irs[i].Color = cc.NewColor
 	}
-	return irs, ok
+	return irs
 }
 
 type XZChecker struct {
@@ -77,8 +77,8 @@ type XZChecker struct {
 	ColorA, ColorB Color
 }
 
-func (cc XZChecker) RayInteraction(r Ray) ([]InteractionResult, bool) {
-	irs, ok := cc.Object.RayInteraction(r)
+func (cc XZChecker) RayInteraction(r Ray) []InteractionResult {
+	irs := cc.Object.RayInteraction(r)
 	for i := range irs {
 		x := int(math.Floor(irs[i].PointOfImpact.X))
 		z := int(math.Floor(irs[i].PointOfImpact.Z))
@@ -88,15 +88,15 @@ func (cc XZChecker) RayInteraction(r Ray) ([]InteractionResult, bool) {
 			irs[i].Color = cc.ColorB
 		}
 	}
-	return irs, ok
+	return irs
 }
 
 type Disable struct {
 	Object
 }
 
-func (d Disable) RayInteraction(r Ray) ([]InteractionResult, bool) {
-	return []InteractionResult{}, false
+func (d Disable) RayInteraction(r Ray) []InteractionResult {
+	return []InteractionResult{}
 }
 
 func (d Disable) Contains(p Vector3f) bool {
@@ -111,14 +111,14 @@ func NewLayers(o ...Object) Layers {
 	return Layers{o}
 }
 
-func (l Layers) RayInteraction(r Ray) ([]InteractionResult, bool) {
+func (l Layers) RayInteraction(r Ray) []InteractionResult {
 	for _, o := range l.Objects {
-		irs, ok := o.RayInteraction(r)
-		if ok {
-			return irs, ok
+		irs := o.RayInteraction(r)
+		if len(irs) > 0 {
+			return irs
 		}
 	}
-	return []InteractionResult{}, false
+	return []InteractionResult{}
 }
 
 func (l Layers) Contains(p Vector3f) bool {
@@ -136,8 +136,8 @@ func NewLogger(prefix string, o Object) Logger {
 	return Logger{o, prefix}
 }
 
-func (l Logger) RayInteraction(r Ray) ([]InteractionResult, bool) {
-	irs, ok := l.Object.RayInteraction(r)
-	log.Printf("%s.RayInteraction(%s) = ([%d]InteractionResult, %#v)", l.Prefix, r, len(irs), ok)
-	return irs, ok
+func (l Logger) RayInteraction(r Ray) []InteractionResult {
+	irs := l.Object.RayInteraction(r)
+	log.Printf("%s.RayInteraction(%s) = [%d]InteractionResult", l.Prefix, r, len(irs))
+	return irs
 }

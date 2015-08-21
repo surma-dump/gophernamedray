@@ -8,7 +8,7 @@ type AxisAlignedBox struct {
 	Min, Max gnr.Vector3f
 }
 
-func (aab AxisAlignedBox) RayInteraction(r gnr.Ray) ([]gnr.InteractionResult, bool) {
+func (aab AxisAlignedBox) RayInteraction(r gnr.Ray) []gnr.InteractionResult {
 	planes := []gnr.Object{
 		Plane{
 			Normal:   gnr.Vector3f{1, 0, 0},
@@ -36,10 +36,7 @@ func (aab AxisAlignedBox) RayInteraction(r gnr.Ray) ([]gnr.InteractionResult, bo
 		},
 	}
 	irs := gnr.ObjectSlice(planes).AggregateSliceInteractionResult(func(irs []gnr.InteractionResult, o gnr.Object) []gnr.InteractionResult {
-		newIrs, ok := o.RayInteraction(r)
-		if !ok {
-			return irs
-		}
+		newIrs := o.RayInteraction(r)
 		p := o.(Plane)
 		newIrs = gnr.InteractionResultSlice(newIrs).SelectInteractionResult(func(ir gnr.InteractionResult) gnr.InteractionResult {
 			if p.Normal.X == 1 {
@@ -58,7 +55,7 @@ func (aab AxisAlignedBox) RayInteraction(r gnr.Ray) ([]gnr.InteractionResult, bo
 	irs = gnr.InteractionResultSlice(irs).Where(func(ir gnr.InteractionResult) bool {
 		return aab.Contains(ir.PointOfImpact)
 	})
-	return irs, len(irs) > 0
+	return irs
 }
 
 func (aab AxisAlignedBox) Contains(p gnr.Vector3f) bool {

@@ -11,7 +11,7 @@ type Sphere struct {
 	Radius float64
 }
 
-func (s Sphere) RayInteraction(r gnr.Ray) ([]gnr.InteractionResult, bool) {
+func (s Sphere) RayInteraction(r gnr.Ray) []gnr.InteractionResult {
 	// Ray: {P | P = r.Origin + t * r.Direction}
 	// Sphere: {P | mag(P - s.Center)^2 - s.Radius^2 = 0}
 	// subsitution
@@ -21,7 +21,7 @@ func (s Sphere) RayInteraction(r gnr.Ray) ([]gnr.InteractionResult, bool) {
 	p2 := math.Pow(p, 2)
 	inSqrt := p2/4 - q
 	if inSqrt < 0 {
-		return []gnr.InteractionResult{}, false
+		return []gnr.InteractionResult{}
 	}
 	sqrt := math.Sqrt(inSqrt)
 
@@ -44,7 +44,7 @@ func (s Sphere) RayInteraction(r gnr.Ray) ([]gnr.InteractionResult, bool) {
 		irs[1].Normal = gnr.VectorDifference(P2, s.Center).Normalize()
 		irs[1].Distance = gnr.VectorDifference(P2, r.Origin).Magnitude()
 	}
-	return irs, true
+	return irs
 }
 
 func (s Sphere) Contains(p gnr.Vector3f) bool {
