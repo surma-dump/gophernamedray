@@ -4,6 +4,7 @@ import (
 	"image"
 	"image/color"
 	"image/draw"
+	"log"
 	"math"
 )
 
@@ -98,6 +99,10 @@ func (d Disable) RayInteraction(r Ray) ([]InteractionResult, bool) {
 	return []InteractionResult{}, false
 }
 
+func (d Disable) Contains(p Vector3f) bool {
+	return false
+}
+
 type Layers struct {
 	Objects []Object
 }
@@ -114,4 +119,25 @@ func (l Layers) RayInteraction(r Ray) ([]InteractionResult, bool) {
 		}
 	}
 	return []InteractionResult{}, false
+}
+
+func (l Layers) Contains(p Vector3f) bool {
+	return ObjectSlice(l.Objects).Any(func(o Object) bool {
+		return o.Contains(p)
+	})
+}
+
+type Logger struct {
+	Object
+	Prefix string
+}
+
+func NewLogger(prefix string, o Object) Logger {
+	return Logger{o, prefix}
+}
+
+func (l Logger) RayInteraction(r Ray) ([]InteractionResult, bool) {
+	irs, ok := l.Object.RayInteraction(r)
+	log.Printf("%s.RayInteraction(%s) = ([%d]InteractionResult, %#v)", l.Prefix, r, len(irs), ok)
+	return irs, ok
 }

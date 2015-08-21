@@ -83,7 +83,7 @@ func main() {
 					),
 					NewColor: gnr.ColorBlue,
 				},
-			),
+			), // Union
 			gnr.NewUnion(
 				gnr.XZChecker{
 					Object: object.Plane{
@@ -120,8 +120,15 @@ func main() {
 					},
 					NewColor: gnr.ColorBlue,
 				},
-			),
-		),
+				gnr.ColorChanger{
+					Object: object.AxisAlignedBox{
+						Min: gnr.Vector3f{-2, 0.5, 0},
+						Max: gnr.Vector3f{-1, 1.5, 1},
+					},
+					NewColor: gnr.ColorRed,
+				},
+			), // Union
+		), // Layers
 	}
 
 	cameras := []gnr.Camera{

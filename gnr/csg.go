@@ -17,11 +17,16 @@ func (u Union) RayInteraction(r Ray) ([]InteractionResult, bool) {
 			return irs
 		}
 		didHitSomething = true
-		irs = append(irs, newIrs...)
-		return irs
+		return append(irs, newIrs...)
 	})
 	if !didHitSomething {
 		return []InteractionResult{}, false
 	}
 	return InteractionResultSlice(irs).SortBy(InteractionResultDistance), true
+}
+
+func (u Union) Contains(p Vector3f) bool {
+	return ObjectSlice(u.Objects).Any(func(o Object) bool {
+		return o.Contains(p)
+	})
 }

@@ -4,6 +4,12 @@ import (
 	"github.com/surma-dump/gophernamedray/gnr"
 )
 
+var (
+	// Epsilon is used as a margin of error to compensate for IEEE 754
+	// inaccuracies.
+	Epsilon = 0.2
+)
+
 // Plane models an infinite 2D plane in 3D space
 type Plane struct {
 	// Normal of the plane
@@ -28,4 +34,10 @@ func (p Plane) RayInteraction(r gnr.Ray) ([]gnr.InteractionResult, bool) {
 
 func (p Plane) DistanceToPoint(pt gnr.Vector3f) float64 {
 	return gnr.VectorProduct(p.Normal.Normalize(), pt) + p.Distance
+}
+
+func (p Plane) Contains(pt gnr.Vector3f) bool {
+	// TODO: Research if there’s a way to check this without being susceptible
+	// to IEEE 754 rounding errors.
+	return p.DistanceToPoint(pt) <= Epsilon
 }

@@ -46,3 +46,9 @@ func (s Sphere) RayInteraction(r gnr.Ray) ([]gnr.InteractionResult, bool) {
 	}
 	return irs, true
 }
+
+func (s Sphere) Contains(p gnr.Vector3f) bool {
+	// TODO: Research if there’s a way to check this without being susceptible
+	// to IEEE 754 rounding errors.
+	return gnr.VectorDifference(p, s.Center).Magnitude()-s.Radius < Epsilon
+}

@@ -1,6 +1,6 @@
 package gnr
 
-// +gen slice:"SortBy"
+// +gen slice:"SortBy,Where,Select[string]"
 type InteractionResult struct {
 	Color                 Color
 	PointOfImpact, Normal Vector3f
