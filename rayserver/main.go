@@ -138,12 +138,21 @@ func main() {
 							NewColor: gnr.ColorGreen,
 						},
 					),
-					gnr.ColorChanger{
-						Object: object.AxisAlignedBox{
-							Min: gnr.Vector3f{-1.5, 0.5, -0.5},
-							Max: gnr.Vector3f{-2.5, 1.5, 0.5},
-						}.Normalize(),
-						NewColor: gnr.ColorMagenta,
+					gnr.Difference{
+						Minuend: gnr.ColorChanger{
+							Object: object.AxisAlignedBox{
+								Min: gnr.Vector3f{-1.5, 0.5, -0.5},
+								Max: gnr.Vector3f{-2.5, 1.5, 0.5},
+							}.Normalize(),
+							NewColor: gnr.ColorMagenta,
+						},
+						Subtrahend: gnr.ColorChanger{
+							Object: object.Sphere{
+								Center: gnr.Vector3f{-1.5, 1.5, -0.5},
+								Radius: 0.5,
+							},
+							NewColor: gnr.ColorGreen,
+						},
 					},
 				), // Union
 			), // Layers

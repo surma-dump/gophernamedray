@@ -45,3 +45,23 @@ func (is Intersection) Contains(p Vector3f) bool {
 		return o.Contains(p)
 	})
 }
+
+type Difference struct {
+	Minuend, Subtrahend Object
+}
+
+func (d Difference) RayInteraction(r Ray) []InteractionResult {
+	mIrs := d.Minuend.RayInteraction(r)
+	sIrs := d.Subtrahend.RayInteraction(r)
+	mIrs = InteractionResultSlice(mIrs).Where(func(ir InteractionResult) bool {
+		return !d.Subtrahend.Contains(ir.PointOfImpact)
+	})
+	sIrs = InteractionResultSlice(sIrs).Where(func(ir InteractionResult) bool {
+		return d.Minuend.Contains(ir.PointOfImpact)
+	})
+	return append(mIrs, sIrs...)
+}
+
+func (d Difference) Contains(p Vector3f) bool {
+	return d.Minuend.Contains(p) && !d.Subtrahend.Contains(p)
+}

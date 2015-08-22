@@ -41,14 +41,15 @@ func (aab AxisAlignedBox) RayInteraction(r gnr.Ray) []gnr.InteractionResult {
 		newIrs := o.RayInteraction(r)
 		p := o.(Plane)
 		newIrs = gnr.InteractionResultSlice(newIrs).SelectInteractionResult(func(ir gnr.InteractionResult) gnr.InteractionResult {
+			// Correct for IEEE754 errors by aligning PoIs with sides of box
 			if math.Abs(p.Normal.X) == 1 {
-				ir.PointOfImpact.X = -p.Distance
+				ir.PointOfImpact.X = -p.Distance * p.Normal.X
 			}
 			if math.Abs(p.Normal.Y) == 1 {
-				ir.PointOfImpact.Y = -p.Distance
+				ir.PointOfImpact.Y = -p.Distance * p.Normal.Y
 			}
 			if math.Abs(p.Normal.Z) == 1 {
-				ir.PointOfImpact.Z = -p.Distance
+				ir.PointOfImpact.Z = -p.Distance * p.Normal.Z
 			}
 			return ir
 		})
