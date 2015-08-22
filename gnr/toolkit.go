@@ -8,8 +8,9 @@ import (
 	"math"
 )
 
-// Lerp returns a function that performs a lerp on the given parameters. Lerp
-// does not check boundaries on the input value.
+// Lerp returns a function that performs a *l*inear int*erp*olation and does
+// a linear map from [inMin; inMax] to [outMin; outMax].
+// Lerp does not check boundaries on the input value.
 func Lerp(inMin, inMax, outMin, outMax float64) func(d float64) float64 {
 	return func(d float64) float64 {
 		return (d-inMin)/(inMax-inMin)*(outMax-outMin) + outMin
@@ -43,6 +44,17 @@ func VLerpCap(inMin, inMax float64, outMin, outMax *Vector3f) func(d float64) *V
 	zLerp := LerpCap(inMin, inMax, outMin.Z, outMax.Z)
 	return func(d float64) *Vector3f {
 		return &Vector3f{xLerp(d), yLerp(d), zLerp(d)}
+	}
+}
+
+// Slerp returns a function that performs a *s*pherical *l*inear int*erp*olation.
+// That functions returns a vector that rotates from
+// outMin when d=0 to outMax when d=1.
+func Slerp(outMin, outMax *Vector3f) func(d float64) *Vector3f {
+	omega := math.Acos(VectorProduct(outMin, outMax))
+	sinOmega := math.Sin(omega)
+	return func(d float64) *Vector3f {
+		return CopyVector3f(outMin).ScalarMultiply(math.Sin((1-d)*omega) / sinOmega).Add(CopyVector3f(outMax).ScalarMultiply(math.Sin(d*omega) / sinOmega))
 	}
 }
 

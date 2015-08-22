@@ -4,6 +4,7 @@ import (
 	"fmt"
 )
 
+// +gen * slice:"Select[*InteractionResult],Select[*Ray],Where"
 type Ray struct {
 	Origin    *Vector3f
 	Direction *Vector3f
