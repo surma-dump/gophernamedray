@@ -8,6 +8,7 @@ import (
 	"image/png"
 	"log"
 	"os"
+	"runtime/pprof"
 
 	"github.com/surma-dump/gophernamedray/gnr"
 	"github.com/surma-dump/gophernamedray/gnr/object"
@@ -22,7 +23,6 @@ const (
 
 func main() {
 	scene := gnr.Scene{
-
 		Object: gnr.FlatShader{
 			Object: gnr.NewLayers(
 				gnr.NewUnion(
@@ -192,6 +192,13 @@ func main() {
 			Angle:         60.0,
 		},
 	}
+	f, err := os.Create("cpu.prof")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer f.Close()
+	pprof.StartCPUProfile(f)
+	defer pprof.StopCPUProfile()
 	for idx, camera := range cameras {
 		scene.Camera = camera.Normalize()
 		img := renderImage(scene)
