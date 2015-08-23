@@ -26,23 +26,23 @@ func LerpCap(inMin, inMax, outMin, outMax float64) func(d float64) float64 {
 }
 
 // VLerp is the same as Lerp but for Vector3f.
-func VLerp(inMin, inMax float64, outMin, outMax Vector3f) func(d float64) Vector3f {
+func VLerp(inMin, inMax float64, outMin, outMax *Vector3f) func(d float64) *Vector3f {
 	xLerp := Lerp(inMin, inMax, outMin.X, outMax.X)
 	yLerp := Lerp(inMin, inMax, outMin.Y, outMax.Y)
 	zLerp := Lerp(inMin, inMax, outMin.Z, outMax.Z)
-	return func(d float64) Vector3f {
-		return Vector3f{xLerp(d), yLerp(d), zLerp(d)}
+	return func(d float64) *Vector3f {
+		return &Vector3f{xLerp(d), yLerp(d), zLerp(d)}
 	}
 }
 
 // VLerpCap is the same as VLerp but caps the input to be in between
 // inMin and inMax.
-func VLerpCap(inMin, inMax float64, outMin, outMax Vector3f) func(d float64) Vector3f {
+func VLerpCap(inMin, inMax float64, outMin, outMax *Vector3f) func(d float64) *Vector3f {
 	xLerp := LerpCap(inMin, inMax, outMin.X, outMax.X)
 	yLerp := LerpCap(inMin, inMax, outMin.Y, outMax.Y)
 	zLerp := LerpCap(inMin, inMax, outMin.Z, outMax.Z)
-	return func(d float64) Vector3f {
-		return Vector3f{xLerp(d), yLerp(d), zLerp(d)}
+	return func(d float64) *Vector3f {
+		return &Vector3f{xLerp(d), yLerp(d), zLerp(d)}
 	}
 }
 
@@ -82,10 +82,10 @@ func (si *subimage) Set(x, y int, c color.Color) {
 
 type ColorChanger struct {
 	Object
-	NewColor Vector3f
+	NewColor *Vector3f
 }
 
-func (cc ColorChanger) RayInteraction(r Ray) []InteractionResult {
+func (cc *ColorChanger) RayInteraction(r *Ray) []*InteractionResult {
 	irs := cc.Object.RayInteraction(r)
 	for i := range irs {
 		irs[i].Color = cc.NewColor
@@ -95,10 +95,10 @@ func (cc ColorChanger) RayInteraction(r Ray) []InteractionResult {
 
 type XZChecker struct {
 	Object
-	ColorA, ColorB Vector3f
+	ColorA, ColorB *Vector3f
 }
 
-func (cc XZChecker) RayInteraction(r Ray) []InteractionResult {
+func (cc *XZChecker) RayInteraction(r *Ray) []*InteractionResult {
 	irs := cc.Object.RayInteraction(r)
 	for i := range irs {
 		x := int(math.Floor(irs[i].PointOfImpact.X))
@@ -116,11 +116,11 @@ type Disable struct {
 	Object
 }
 
-func (d Disable) RayInteraction(r Ray) []InteractionResult {
-	return []InteractionResult{}
+func (d *Disable) RayInteraction(r *Ray) []*InteractionResult {
+	return []*InteractionResult{}
 }
 
-func (d Disable) Contains(p Vector3f) bool {
+func (d *Disable) Contains(p *Vector3f) bool {
 	return false
 }
 
@@ -128,21 +128,21 @@ type Layers struct {
 	Objects []Object
 }
 
-func NewLayers(o ...Object) Layers {
-	return Layers{o}
+func NewLayers(o ...Object) *Layers {
+	return &Layers{o}
 }
 
-func (l Layers) RayInteraction(r Ray) []InteractionResult {
+func (l *Layers) RayInteraction(r *Ray) []*InteractionResult {
 	for _, o := range l.Objects {
 		irs := o.RayInteraction(r)
 		if len(irs) > 0 {
 			return irs
 		}
 	}
-	return []InteractionResult{}
+	return []*InteractionResult{}
 }
 
-func (l Layers) Contains(p Vector3f) bool {
+func (l *Layers) Contains(p *Vector3f) bool {
 	return ObjectSlice(l.Objects).Any(func(o Object) bool {
 		return o.Contains(p)
 	})
@@ -153,11 +153,11 @@ type Logger struct {
 	Prefix string
 }
 
-func NewLogger(prefix string, o Object) Logger {
-	return Logger{o, prefix}
+func NewLogger(prefix string, o Object) *Logger {
+	return &Logger{o, prefix}
 }
 
-func (l Logger) RayInteraction(r Ray) []InteractionResult {
+func (l *Logger) RayInteraction(r *Ray) []*InteractionResult {
 	irs := l.Object.RayInteraction(r)
 	log.Printf("%s.RayInteraction(%s) = [%d]InteractionResult", l.Prefix, r, len(irs))
 	return irs

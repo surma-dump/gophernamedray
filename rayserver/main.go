@@ -22,22 +22,22 @@ const (
 )
 
 func main() {
-	scene := gnr.Scene{
-		Object: gnr.FlatShader{
+	scene := &gnr.Scene{
+		Object: &gnr.FlatShader{
 			Object: gnr.NewLayers(
 				gnr.NewUnion(
-					gnr.ColorChanger{
-						Object: gnr.Union{
+					&gnr.ColorChanger{
+						Object: &gnr.Union{
 							Objects: []gnr.Object{
-								object.Triangle{
-									Points: [3]gnr.Vector3f{
+								&object.Triangle{
+									Points: [3]*gnr.Vector3f{
 										{0, -AxisHeads, 0},
 										{1, 0, 0},
 										{0, AxisHeads, 0},
 									},
 								},
-								object.Triangle{
-									Points: [3]gnr.Vector3f{
+								&object.Triangle{
+									Points: [3]*gnr.Vector3f{
 										{0, 0, -AxisHeads},
 										{1, 0, 0},
 										{0, 0, AxisHeads},
@@ -47,17 +47,17 @@ func main() {
 						},
 						NewColor: gnr.ColorRed,
 					},
-					gnr.ColorChanger{
+					&gnr.ColorChanger{
 						Object: gnr.NewUnion(
-							object.Triangle{
-								Points: [3]gnr.Vector3f{
+							&object.Triangle{
+								Points: [3]*gnr.Vector3f{
 									{-AxisHeads, 0, 0},
 									{AxisHeads, 0, 0},
 									{0, 1, 0},
 								},
 							},
-							object.Triangle{
-								Points: [3]gnr.Vector3f{
+							&object.Triangle{
+								Points: [3]*gnr.Vector3f{
 									{0, 0, -AxisHeads},
 									{0, 0, AxisHeads},
 									{0, 1, 0},
@@ -66,17 +66,17 @@ func main() {
 						),
 						NewColor: gnr.ColorGreen,
 					},
-					gnr.ColorChanger{
+					&gnr.ColorChanger{
 						Object: gnr.NewUnion(
-							object.Triangle{
-								Points: [3]gnr.Vector3f{
+							&object.Triangle{
+								Points: [3]*gnr.Vector3f{
 									{-AxisHeads, 0, 0},
 									{AxisHeads, 0, 0},
 									{0, 0, 1},
 								},
 							},
-							object.Triangle{
-								Points: [3]gnr.Vector3f{
+							&object.Triangle{
+								Points: [3]*gnr.Vector3f{
 									{0, -AxisHeads, 0},
 									{0, 0, 1},
 									{0, AxisHeads, 0},
@@ -87,17 +87,17 @@ func main() {
 					},
 				), // Union
 				gnr.NewUnion(
-					gnr.XZChecker{
-						Object: object.Plane{
-							Normal:   gnr.Vector3f{0, 1, 0},
+					&gnr.XZChecker{
+						Object: &object.Plane{
+							Normal:   &gnr.Vector3f{0, 1, 0},
 							Distance: 0,
 						},
 						ColorA: gnr.ColorWhite,
 						ColorB: gnr.ColorBlack,
 					},
-					gnr.ColorChanger{
-						Object: object.Triangle{
-							Points: [3]gnr.Vector3f{
+					&gnr.ColorChanger{
+						Object: &object.Triangle{
+							Points: [3]*gnr.Vector3f{
 								{-2, 2, 0},
 								{0, 2, 0},
 								{-1, 4, 0},
@@ -105,9 +105,9 @@ func main() {
 						},
 						NewColor: gnr.ColorYellow,
 					},
-					gnr.ColorChanger{
-						Object: object.Triangle{
-							Points: [3]gnr.Vector3f{
+					&gnr.ColorChanger{
+						Object: &object.Triangle{
+							Points: [3]*gnr.Vector3f{
 								{2, 2, 0},
 								{0, 2, 0},
 								{1, 4, 0},
@@ -115,40 +115,40 @@ func main() {
 						},
 						NewColor: gnr.ColorCyan,
 					},
-					gnr.ColorChanger{
-						Object: object.Sphere{
-							Center: gnr.Vector3f{1, 1, 0},
+					&gnr.ColorChanger{
+						Object: &object.Sphere{
+							Center: &gnr.Vector3f{1, 1, 0},
 							Radius: 1,
 						},
 						NewColor: gnr.ColorBlue,
 					},
 					gnr.NewIntersection(
-						gnr.ColorChanger{
-							Object: object.AxisAlignedBox{
-								Min: gnr.Vector3f{-1, 0.5, -0.5},
-								Max: gnr.Vector3f{0, 1.5, 0.5},
-							}.Normalize(),
+						&gnr.ColorChanger{
+							Object: &object.AxisAlignedBox{
+								Min: &gnr.Vector3f{-1, 0.5, -0.5},
+								Max: &gnr.Vector3f{0, 1.5, 0.5},
+							},
 							NewColor: gnr.ColorRed,
 						},
-						gnr.ColorChanger{
-							Object: object.Sphere{
-								Center: gnr.Vector3f{-0.5, 1, 0},
+						&gnr.ColorChanger{
+							Object: &object.Sphere{
+								Center: &gnr.Vector3f{-0.5, 1, 0},
 								Radius: 0.7,
 							},
 							NewColor: gnr.ColorGreen,
 						},
 					),
-					gnr.Difference{
-						Minuend: gnr.ColorChanger{
-							Object: object.AxisAlignedBox{
-								Min: gnr.Vector3f{-1.5, 0.5, -0.5},
-								Max: gnr.Vector3f{-2.5, 1.5, 0.5},
-							}.Normalize(),
+					&gnr.Difference{
+						Minuend: &gnr.ColorChanger{
+							Object: &object.AxisAlignedBox{
+								Min: &gnr.Vector3f{-2.5, 0.5, -0.5},
+								Max: &gnr.Vector3f{-1.5, 1.5, 0.5},
+							},
 							NewColor: gnr.ColorMagenta,
 						},
-						Subtrahend: gnr.ColorChanger{
-							Object: object.Sphere{
-								Center: gnr.Vector3f{-1.5, 1.5, -0.5},
+						Subtrahend: &gnr.ColorChanger{
+							Object: &object.Sphere{
+								Center: &gnr.Vector3f{-1.5, 1.5, -0.5},
 								Radius: 0.5,
 							},
 							NewColor: gnr.ColorGreen,
@@ -156,35 +156,35 @@ func main() {
 					},
 				), // Union
 			), // Layers
-			FalloffFunc: gnr.NewLinearFalloffFunc(gnr.Vector3f{-3, -5, 1}),
+			FalloffFunc: gnr.NewLinearFalloffFunc(&gnr.Vector3f{-3, -5, 1}),
 		}, // FlatShader
 	}
 
-	cameras := []gnr.Camera{
-		gnr.Camera{
-			Position:      gnr.Vector3f{0, 1, -5},
-			ViewDirection: gnr.Vector3f{0, 0, 1},
-			UpDirection:   gnr.Vector3f{0, 1, 0},
+	cameras := []*gnr.Camera{
+		{
+			Position:      &gnr.Vector3f{0, 1, -5},
+			ViewDirection: &gnr.Vector3f{0, 0, 1},
+			UpDirection:   &gnr.Vector3f{0, 1, 0},
 			PixelWidth:    Width,
 			PixelHeight:   Height,
 			VirtualWidth:  1,
 			VirtualHeight: 1,
 			Angle:         60.0,
 		},
-		gnr.Camera{
-			Position:      gnr.Vector3f{0, 1, 5},
-			ViewDirection: gnr.Vector3f{0, 0, -1},
-			UpDirection:   gnr.Vector3f{0, 1, 0},
+		{
+			Position:      &gnr.Vector3f{0, 1, 5},
+			ViewDirection: &gnr.Vector3f{0, 0, -1},
+			UpDirection:   &gnr.Vector3f{0, 1, 0},
 			PixelWidth:    Width,
 			PixelHeight:   Height,
 			VirtualWidth:  1,
 			VirtualHeight: 1,
 			Angle:         60.0,
 		},
-		gnr.Camera{
-			Position:      gnr.Vector3f{3, 3, -3},
-			ViewDirection: gnr.Vector3f{-3, -3, 3},
-			UpDirection:   gnr.Vector3f{0, 1, 0},
+		{
+			Position:      &gnr.Vector3f{3, 3, -3},
+			ViewDirection: &gnr.Vector3f{-3, -3, 3},
+			UpDirection:   &gnr.Vector3f{0, 1, 0},
 			PixelWidth:    Width,
 			PixelHeight:   Height,
 			VirtualWidth:  1,
@@ -200,7 +200,8 @@ func main() {
 	pprof.StartCPUProfile(f)
 	defer pprof.StopCPUProfile()
 	for idx, camera := range cameras {
-		scene.Camera = camera.Normalize()
+		scene.Camera = camera
+		scene.Camera.Normalize()
 		img := renderImage(scene)
 		f, e := os.Create(fmt.Sprintf("image_%03d.png", idx))
 		if e != nil {
@@ -211,7 +212,7 @@ func main() {
 	}
 }
 
-func renderImage(scene gnr.Scene) image.Image {
+func renderImage(scene *gnr.Scene) image.Image {
 	img := image.NewRGBA(image.Rectangle{
 		Min: image.Point{0, 0},
 		Max: image.Point{Width * 2, Height * 2},
