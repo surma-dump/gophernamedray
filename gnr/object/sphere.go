@@ -29,24 +29,24 @@ func (s *Sphere) RayInteraction(r *gnr.Ray) []*gnr.InteractionResult {
 	t2 := -p/2 - sqrt
 	P1 := gnr.VectorSum(r.Origin, r.Direction.Multiply(t1))
 	P2 := gnr.VectorSum(r.Origin, r.Direction.Multiply(t2))
-	ir := &gnr.InteractionResult{
-		Color: gnr.ColorWhite,
+	irs := []*gnr.InteractionResult{
+		{Color: gnr.ColorWhite},
+		{Color: gnr.ColorWhite},
 	}
 
-	irs := make([]*gnr.InteractionResult, 0, 2)
-	irs = append(irs, ir)
 	irs[0].PointOfImpact = P1
 	irs[0].Normal = gnr.VectorDifference(P1, s.Center)
 	// TODO: Delete following line?
 	irs[0].Normal.Normalize()
 	irs[0].Distance = gnr.VectorDifference(P1, r.Origin).Magnitude()
 	if inSqrt != 0 {
-		irs = append(irs, ir)
 		irs[1].PointOfImpact = P2
 		irs[1].Normal = gnr.VectorDifference(P2, s.Center)
 		// TODO: Delete following line?
 		irs[1].Normal.Normalize()
 		irs[1].Distance = gnr.VectorDifference(P2, r.Origin).Magnitude()
+	} else {
+		irs = irs[0:1]
 	}
 	return irs
 }
