@@ -36,13 +36,11 @@ func (s *Sphere) RayInteraction(r *gnr.Ray) []*gnr.InteractionResult {
 	}
 
 	irs[0].PointOfImpact = P1
-	// TODO: Do we need to normalize?
-	irs[0].Normal = gnr.VectorDifference(P1, s.Center).Normalize()
+	irs[0].Normal = gnr.VectorDifference(P1, s.Center)
 	irs[0].Distance = gnr.VectorDifference(P1, r.Origin).Magnitude()
 	if inSqrt != 0 {
 		irs[1].PointOfImpact = P2
-		// TODO: Do we need to normalize?
-		irs[1].Normal = gnr.VectorDifference(P2, s.Center).Normalize()
+		irs[1].Normal = gnr.VectorDifference(P2, s.Center)
 		irs[1].Distance = gnr.VectorDifference(P2, r.Origin).Magnitude()
 	} else {
 		irs = irs[0:1]
