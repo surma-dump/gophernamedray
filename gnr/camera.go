@@ -24,17 +24,15 @@ type SphericalCamera struct {
 func (c *SphericalCamera) Normalize() {
 	c.ViewDirection.Normalize()
 	side := VectorCross(c.UpDirection, c.ViewDirection)
-	c.UpDirection = VectorCross(c.ViewDirection, side)
-	c.UpDirection.Normalize()
+	c.UpDirection = VectorCross(c.ViewDirection, side).Normalize()
 }
 
 func (c *SphericalCamera) GetRayForPixel(x, y uint64) *Ray {
 	r := &Ray{
-		Origin: c.Position,
+		Origin: CopyVector3f(c.Position),
 	}
 
-	side := VectorCross(c.UpDirection, c.ViewDirection)
-	side.Normalize()
+	side := VectorCross(c.UpDirection, c.ViewDirection).Normalize()
 
 	// Note: The 3D coordinate system has inverted y axis compared
 	// to the 2D coordinate system of the image canvas.
@@ -62,29 +60,23 @@ type PlanarCamera struct {
 func (c *PlanarCamera) Normalize() {
 	c.ViewDirection.Normalize()
 	side := VectorCross(c.UpDirection, c.ViewDirection)
-	c.UpDirection = VectorCross(c.ViewDirection, side)
-	c.UpDirection.Normalize()
+	c.UpDirection = VectorCross(c.ViewDirection, side).Normalize()
 }
 
 func (c *PlanarCamera) GetRayForPixel(x, y uint64) *Ray {
 	r := &Ray{
-		Origin: c.Position,
+		Origin: CopyVector3f(c.Position),
 	}
 
-	side := VectorCross(c.UpDirection, c.ViewDirection)
-	side.Normalize()
+	side := VectorCross(c.UpDirection, c.ViewDirection).Normalize()
 
 	// Note: The 3D coordinate system has inverted y axis compared
 	// to the 2D coordinate system of the image canvas.
-	projectionPlane := VectorSum(c.Position, c.ViewDirection.Multiply(c.GetScreenDistance()))
-	projectionPlane = VectorSum(projectionPlane, side.Multiply(-c.VirtualWidth/2))
-	projectionPlane = VectorSum(projectionPlane, c.UpDirection.Multiply(c.VirtualHeight/2))
+	projectionPlane := CopyVector3f(c.ViewDirection).ScalarMultiply(c.GetScreenDistance()).Add(c.Position)
+	projectionPlane = projectionPlane.Add(side.ScalarMultiply(-c.VirtualWidth/2 + float64(x)*c.VirtualWidth/float64(c.PixelWidth)))
+	projectionPlane = projectionPlane.Add(CopyVector3f(c.UpDirection).ScalarMultiply(c.VirtualHeight/2 - float64(y)*c.VirtualHeight/float64(c.PixelHeight)))
 
-	projectionPlane = VectorSum(projectionPlane, side.Multiply(float64(x)*c.VirtualWidth/float64(c.PixelWidth)))
-	projectionPlane = VectorSum(projectionPlane, c.UpDirection.Multiply(-float64(y)*c.VirtualHeight/float64(c.PixelHeight)))
-
-	r.Direction = VectorDifference(projectionPlane, c.Position)
-	r.Direction.Normalize()
+	r.Direction = projectionPlane.Subtract(c.Position).Normalize()
 	return r
 }
 

@@ -18,42 +18,54 @@ func (v *Vector3f) Magnitude() float64 {
 	return math.Sqrt(VectorProduct(v, v))
 }
 
-func (v *Vector3f) Normalize() {
+func (v *Vector3f) Normalize() *Vector3f {
 	m := v.Magnitude()
 	if m == 0 {
-		return
+		return v
 	}
-	v.X = v.X / m
-	v.Y = v.Y / m
-	v.Z = v.Z / m
+	v.X /= m
+	v.Y /= m
+	v.Z /= m
+	return v
 }
 
 func (v *Vector3f) String() string {
 	return fmt.Sprintf("(%0.3f, %0.3f, %0.3f)", v.X, v.Y, v.Z)
 }
 
-func (v *Vector3f) Multiply(f float64) *Vector3f {
-	return &Vector3f{
-		X: v.X * f,
-		Y: v.Y * f,
-		Z: v.Z * f,
-	}
+func (v *Vector3f) ScalarMultiply(f float64) *Vector3f {
+	v.X *= f
+	v.Y *= f
+	v.Z *= f
+	return v
+}
+
+func (v *Vector3f) Add(ov *Vector3f) *Vector3f {
+	v.X += ov.X
+	v.Y += ov.Y
+	v.Z += ov.Z
+	return v
+}
+
+func (v *Vector3f) Subtract(ov *Vector3f) *Vector3f {
+	v.X -= ov.X
+	v.Y -= ov.Y
+	v.Z -= ov.Z
+	return v
 }
 
 func VectorSum(v1, v2 *Vector3f) *Vector3f {
-	return &Vector3f{
-		X: v1.X + v2.X,
-		Y: v1.Y + v2.Y,
-		Z: v1.Z + v2.Z,
-	}
+	r := &Vector3f{}
+	*r = *v1
+	r.Add(v2)
+	return r
 }
 
 func VectorDifference(v1, v2 *Vector3f) *Vector3f {
-	return &Vector3f{
-		X: v1.X - v2.X,
-		Y: v1.Y - v2.Y,
-		Z: v1.Z - v2.Z,
-	}
+	r := &Vector3f{}
+	*r = *v1
+	r.Subtract(v2)
+	return r
 }
 
 func VectorProduct(v1, v2 *Vector3f) float64 {

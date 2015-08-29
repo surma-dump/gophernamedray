@@ -54,9 +54,9 @@ func (t *Triangle) RayInteraction(r *gnr.Ray) []*gnr.InteractionResult {
 		return []*gnr.InteractionResult{}
 	}
 
+	// TODO: Is a copy necessary?
 	return []*gnr.InteractionResult{{
-		Color: gnr.ColorWhite,
-		// TODO: Are copys necessary?
+		Color:         gnr.ColorWhite,
 		PointOfImpact: ir[0].PointOfImpact,
 		Normal:        ir[0].Normal,
 		Distance:      gnr.VectorDifference(ir[0].PointOfImpact, r.Origin).Magnitude(),

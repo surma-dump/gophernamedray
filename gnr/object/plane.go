@@ -28,7 +28,7 @@ func (p *Plane) RayInteraction(r *gnr.Ray) []*gnr.InteractionResult {
 	if t < 0 {
 		return []*gnr.InteractionResult{}
 	}
-	impact := gnr.VectorSum(r.Direction.Multiply(t), r.Origin)
+	impact := gnr.CopyVector3f(r.Direction).ScalarMultiply(t).Add(r.Origin)
 	return []*gnr.InteractionResult{{
 		Color:         gnr.ColorWhite,
 		PointOfImpact: impact,
@@ -38,8 +38,7 @@ func (p *Plane) RayInteraction(r *gnr.Ray) []*gnr.InteractionResult {
 }
 
 func (p *Plane) DistanceToPoint(pt *gnr.Vector3f) float64 {
-	n := gnr.CopyVector3f(p.Normal)
-	n.Normalize()
+	n := gnr.CopyVector3f(p.Normal).Normalize()
 	return math.Abs(gnr.VectorProduct(n, pt) + p.Distance)
 }
 

@@ -35,26 +35,27 @@ func (m *Matrix33f) VectorProduct(v *Vector3f) *Vector3f {
 }
 
 func (m *Matrix33f) Multiply(f float64) *Matrix33f {
-	return &Matrix33f{
-		Values: [9]float64{
-			m.Values[0] * f, m.Values[1] * f, m.Values[2] * f,
-			m.Values[3] * f, m.Values[4] * f, m.Values[5] * f,
-			m.Values[6] * f, m.Values[7] * f, m.Values[8] * f,
-		},
+	for i := range m.Values {
+		m.Values[i] *= f
 	}
+	return m
+}
+
+func (m *Matrix33f) Add(mo *Matrix33f) *Matrix33f {
+	for i := range m.Values {
+		m.Values[i] += mo.Values[i]
+	}
+	return m
 }
 
 func MatrixSum(m1, m2 *Matrix33f) *Matrix33f {
-	return &Matrix33f{
-		Values: [9]float64{
-			m1.Values[0] + m2.Values[0], m1.Values[1] + m2.Values[1], m1.Values[2] + m2.Values[2],
-			m1.Values[3] + m2.Values[3], m1.Values[4] + m2.Values[4], m1.Values[5] + m2.Values[5],
-			m1.Values[6] + m2.Values[6], m1.Values[7] + m2.Values[7], m1.Values[8] + m2.Values[8],
-		},
-	}
+	r := &Matrix33f{}
+	*r = *m1
+	r.Add(m2)
+	return r
 }
 
-func MatrixCopy(m *Matrix33f) *Matrix33f {
+func CopyMatrix33f(m *Matrix33f) *Matrix33f {
 	r := &Matrix33f{}
 	*r = *m
 	return r
@@ -62,7 +63,9 @@ func MatrixCopy(m *Matrix33f) *Matrix33f {
 
 func RotationMatrix(axis *Vector3f, angle float64) *Matrix33f {
 	sin, cos := math.Sin(angle), math.Cos(angle)
-	return MatrixSum(MatrixSum(MatrixIdentity.Multiply(cos), axis.CrossProductMatrix().Multiply(sin)), VectorTensorProduct(axis, axis).Multiply(1-cos))
+	return CopyMatrix33f(MatrixIdentity).Multiply(cos).
+		Add(axis.CrossProductMatrix().Multiply(sin)).
+		Add(VectorTensorProduct(axis, axis).Multiply(1 - cos))
 }
 
 func MatrixEqual(m1, m2 *Matrix33f) bool {

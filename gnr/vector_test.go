@@ -22,14 +22,44 @@ func TestVector3f_Normalize(t *testing.T) {
 	}
 }
 
-func TestVector3f_Multiply(t *testing.T) {
+func TestVector3f_ScalarMultiply(t *testing.T) {
 	v1 := &Vector3f{0, 1, 2}
-	r := v1.Multiply(5)
+	r := v1.ScalarMultiply(5)
 	if !VectorEqual(r, &Vector3f{0, 5, 10}) {
 		t.Fatalf("Unexpected result: %s", r)
 	}
-	if !VectorEqual(v1, &Vector3f{0, 1, 2}) {
+	if !VectorEqual(v1, r) {
 		t.Fatalf("Vector changed: %s", v1)
+	}
+}
+
+func TestVector3f_Add(t *testing.T) {
+	v1 := &Vector3f{1, 1, 1}
+	v2 := &Vector3f{1, 2, 3}
+	r := v1.Add(v2)
+	if !VectorEqual(r, &Vector3f{2, 3, 4}) {
+		t.Fatalf("Unexpected result: %s", r)
+	}
+	if !VectorEqual(v1, r) {
+		t.Fatalf("Vector v1 changed: %s", v1)
+	}
+	if !VectorEqual(v2, &Vector3f{1, 2, 3}) {
+		t.Fatalf("Vector v2 changed: %s", v2)
+	}
+}
+
+func TestVector3f_Subtract(t *testing.T) {
+	v1 := &Vector3f{1, 1, 1}
+	v2 := &Vector3f{1, 2, 3}
+	r := v1.Subtract(v2)
+	if !VectorEqual(r, &Vector3f{0, -1, -2}) {
+		t.Fatalf("Unexpected result: %s", r)
+	}
+	if !VectorEqual(v1, r) {
+		t.Fatalf("Vector v1 changed: %s", v1)
+	}
+	if !VectorEqual(v2, &Vector3f{1, 2, 3}) {
+		t.Fatalf("Vector v2 changed: %s", v2)
 	}
 }
 

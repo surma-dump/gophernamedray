@@ -41,13 +41,41 @@ func TestMatrix33f_Multiply(t *testing.T) {
 	}}) {
 		t.Fatalf("Unexpected result: %s", r)
 	}
-	if !MatrixEqual(m1, &Matrix33f{[9]float64{
+	if !MatrixEqual(r, m1) {
+		t.Fatalf("Matrix changed: %s", m1)
+	}
+}
+
+func TestMatrix33f_Add(t *testing.T) {
+	m1 := &Matrix33f{[9]float64{
 		1, 2, 3,
 		4, 5, 6,
 		7, 8, 9,
+	}}
+	m2 := &Matrix33f{[9]float64{
+		1, 1, 1,
+		1, 1, 1,
+		1, 1, 1,
+	}}
+	r := m1.Add(m2)
+	if !MatrixEqual(r, &Matrix33f{[9]float64{
+		2, 3, 4,
+		5, 6, 7,
+		8, 9, 10,
 	}}) {
-		t.Fatalf("Matrix changed: %s", m1)
+		t.Fatalf("Unexpected result: %s", r)
 	}
+	if !MatrixEqual(r, m1) {
+		t.Fatalf("Matrix m1 changed: %s", m1)
+	}
+	if !MatrixEqual(m2, &Matrix33f{[9]float64{
+		1, 1, 1,
+		1, 1, 1,
+		1, 1, 1,
+	}}) {
+		t.Fatalf("Matrix m2 changed: %s", m2)
+	}
+
 }
 
 func TestMatrixSum(t *testing.T) {
