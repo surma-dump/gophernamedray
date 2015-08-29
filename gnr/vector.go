@@ -91,3 +91,7 @@ func VectorTensorProduct(v1, v2 *Vector3f) *Matrix33f {
 		},
 	}
 }
+
+func VectorEqual(v1, v2 *Vector3f) bool {
+	return v1.X == v2.X && v1.Y == v2.Y && v1.Z == v2.Z
+}

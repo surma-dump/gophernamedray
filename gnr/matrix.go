@@ -1,6 +1,7 @@
 package gnr
 
 import (
+	"fmt"
 	"math"
 )
 
@@ -19,6 +20,10 @@ type Matrix33f struct {
 	// |3 4 5|
 	// |6 7 8|
 	Values [9]float64
+}
+
+func (m *Matrix33f) String() string {
+	return fmt.Sprintf("[%0.3f, %0.3f, %0.3f; %0.3f, %0.3f, %0.3f; %0.3f, %0.3f, %0.3f]", m.Values[0], m.Values[1], m.Values[2], m.Values[3], m.Values[4], m.Values[5], m.Values[6], m.Values[7], m.Values[8])
 }
 
 func (m *Matrix33f) VectorProduct(v *Vector3f) *Vector3f {
@@ -58,4 +63,12 @@ func MatrixCopy(m *Matrix33f) *Matrix33f {
 func RotationMatrix(axis *Vector3f, angle float64) *Matrix33f {
 	sin, cos := math.Sin(angle), math.Cos(angle)
 	return MatrixSum(MatrixSum(MatrixIdentity.Multiply(cos), axis.CrossProductMatrix().Multiply(sin)), VectorTensorProduct(axis, axis).Multiply(1-cos))
+}
+
+func MatrixEqual(m1, m2 *Matrix33f) bool {
+	r := true
+	for i := range m1.Values {
+		r = r && m1.Values[i] == m2.Values[i]
+	}
+	return r
 }
