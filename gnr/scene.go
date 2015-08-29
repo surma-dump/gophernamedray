@@ -2,7 +2,7 @@ package gnr
 
 type Scene struct {
 	GlobalLighting bool
-	Camera         *Camera
+	Camera         Camera
 	Object         Object
 }
 

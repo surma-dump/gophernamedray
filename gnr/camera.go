@@ -4,7 +4,51 @@ import (
 	"math"
 )
 
-type Camera struct {
+type Camera interface {
+	// GetRayForPixel creates a ray in 3D space that corresponds to the pixel on
+	// the 2D canvas of the image. This should be the only function where these
+	// 2 spaces meet.
+	GetRayForPixel(x, y uint64) *Ray
+	Normalize()
+}
+
+type SphericalCamera struct {
+	Position      *Vector3f
+	ViewDirection *Vector3f
+	UpDirection   *Vector3f
+	PixelWidth    uint64
+	PixelHeight   uint64
+	Angle         float64
+}
+
+func (c *SphericalCamera) Normalize() {
+	c.ViewDirection.Normalize()
+	side := VectorCross(c.UpDirection, c.ViewDirection)
+	c.UpDirection = VectorCross(c.ViewDirection, side)
+	c.UpDirection.Normalize()
+}
+
+func (c *SphericalCamera) GetRayForPixel(x, y uint64) *Ray {
+	r := &Ray{
+		Origin: c.Position,
+	}
+
+	side := VectorCross(c.UpDirection, c.ViewDirection)
+	side.Normalize()
+
+	// Note: The 3D coordinate system has inverted y axis compared
+	// to the 2D coordinate system of the image canvas.
+	angle := Deg2Rad(c.Angle / 2)
+	xAngle := Lerp(0, float64(c.PixelWidth), -angle, angle)(float64(x))
+	yAngle := Lerp(0, float64(c.PixelHeight), -angle, angle)(float64(y))
+	xRotation := RotationMatrix(c.UpDirection, xAngle)
+	yRotation := RotationMatrix(side, yAngle)
+
+	r.Direction = yRotation.VectorProduct(xRotation.VectorProduct(c.ViewDirection))
+	return r
+}
+
+type PlanarCamera struct {
 	Position      *Vector3f
 	ViewDirection *Vector3f
 	UpDirection   *Vector3f
@@ -15,17 +59,14 @@ type Camera struct {
 	Angle         float64
 }
 
-func (c *Camera) Normalize() {
+func (c *PlanarCamera) Normalize() {
 	c.ViewDirection.Normalize()
 	side := VectorCross(c.UpDirection, c.ViewDirection)
 	c.UpDirection = VectorCross(c.ViewDirection, side)
 	c.UpDirection.Normalize()
 }
 
-// GetRayForPixel creates a ray in 3D space that corresponds to the pixel on
-// the 2D canvas of the image. This should be the only function where these
-// 2 spaces meet. Camera must be normalized.
-func (c *Camera) GetRayForPixel(x, y uint64) *Ray {
+func (c *PlanarCamera) GetRayForPixel(x, y uint64) *Ray {
 	r := &Ray{
 		Origin: c.Position,
 	}
@@ -47,6 +88,10 @@ func (c *Camera) GetRayForPixel(x, y uint64) *Ray {
 	return r
 }
 
-func (c *Camera) GetScreenDistance() float64 {
-	return c.VirtualWidth / (2 * math.Tan(c.Angle/2/360*2*math.Pi))
+func (c *PlanarCamera) GetScreenDistance() float64 {
+	return c.VirtualWidth / (2 * math.Tan(Deg2Rad(c.Angle/2)))
+}
+
+func Deg2Rad(d float64) float64 {
+	return d / 360 * 2 * math.Pi
 }

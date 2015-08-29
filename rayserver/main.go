@@ -160,28 +160,8 @@ func main() {
 		}, // FlatShader
 	}
 
-	cameras := []*gnr.Camera{
-		{
-			Position:      &gnr.Vector3f{0, 1, -5},
-			ViewDirection: &gnr.Vector3f{0, 0, 1},
-			UpDirection:   &gnr.Vector3f{0, 1, 0},
-			PixelWidth:    Width,
-			PixelHeight:   Height,
-			VirtualWidth:  1,
-			VirtualHeight: 1,
-			Angle:         60.0,
-		},
-		{
-			Position:      &gnr.Vector3f{0, 1, 5},
-			ViewDirection: &gnr.Vector3f{0, 0, -1},
-			UpDirection:   &gnr.Vector3f{0, 1, 0},
-			PixelWidth:    Width,
-			PixelHeight:   Height,
-			VirtualWidth:  1,
-			VirtualHeight: 1,
-			Angle:         60.0,
-		},
-		{
+	cameras := []gnr.Camera{
+		&gnr.PlanarCamera{
 			Position:      &gnr.Vector3f{3, 3, -3},
 			ViewDirection: &gnr.Vector3f{-3, -3, 3},
 			UpDirection:   &gnr.Vector3f{0, 1, 0},
@@ -189,6 +169,14 @@ func main() {
 			PixelHeight:   Height,
 			VirtualWidth:  1,
 			VirtualHeight: 1,
+			Angle:         60.0,
+		},
+		&gnr.SphericalCamera{
+			Position:      &gnr.Vector3f{3, 3, -3},
+			ViewDirection: &gnr.Vector3f{-3, -3, 3},
+			UpDirection:   &gnr.Vector3f{0, 1, 0},
+			PixelWidth:    Width,
+			PixelHeight:   Height,
 			Angle:         60.0,
 		},
 	}

@@ -71,3 +71,23 @@ func VectorCross(v1, v2 *Vector3f) *Vector3f {
 		Z: v1.X*v2.Y - v1.Y*v2.X,
 	}
 }
+
+func (v *Vector3f) CrossProductMatrix() *Matrix33f {
+	return &Matrix33f{
+		Values: [9]float64{
+			0, -v.Z, v.Y,
+			v.Z, 0, -v.X,
+			-v.Y, v.X, 0,
+		},
+	}
+}
+
+func VectorTensorProduct(v1, v2 *Vector3f) *Matrix33f {
+	return &Matrix33f{
+		Values: [9]float64{
+			v1.X * v2.X, v1.X * v2.Y, v1.X * v2.Z,
+			v1.Y * v2.X, v1.Y * v2.Y, v1.Y * v2.Z,
+			v1.Z * v2.X, v1.Z * v2.Y, v1.Z * v2.Z,
+		},
+	}
+}
