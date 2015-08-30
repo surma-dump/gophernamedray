@@ -11,22 +11,16 @@ import (
 
 	"github.com/nu7hatch/gouuid"
 	"github.com/surma/httptools"
+)
 
-	// "github.com/surma-dump/gophernamedray/gnr"
-	// "github.com/surma-dump/gophernamedray/gnr/object"
+const (
+	Width  = 600
+	Height = 600
 )
 
 type jobMap struct {
 	Map map[string]*job
 	sync.RWMutex
-}
-
-type job struct {
-	ID     string    `json:"id"`
-	Scene  string    `json:"scene"`
-	Shader string    `json:"shader"`
-	Start  time.Time `json:"start"`
-	End    time.Time `json:"end"`
 }
 
 var jobs = &jobMap{
@@ -131,11 +125,6 @@ func deleteJob(w http.ResponseWriter, r *http.Request) {
 		delete(jobs.Map, id)
 	}()
 	ErrorWithMessage(w, http.StatusNoContent)
-}
-
-func runJob(j *job) {
-	time.Sleep(4 * time.Second)
-	j.End = time.Now()
 }
 
 func ErrorWithMessage(w http.ResponseWriter, code int) {
