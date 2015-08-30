@@ -1,9 +1,10 @@
 package main
 
 import (
-	"log"
+	"fmt"
 
 	"github.com/robertkrimen/otto"
+	_ "github.com/robertkrimen/otto/underscore"
 
 	"github.com/surma-dump/gophernamedray/gnr"
 	"github.com/surma-dump/gophernamedray/gnr/object"
@@ -18,15 +19,12 @@ func (rm refMap) MustResolve(ref otto.Value) interface{} {
 	}
 	v, ok := rm[key]
 	if !ok {
-		log.Printf("ref=%#v", ref)
-		log.Printf("key=%#v", key)
-		log.Printf("refMap=%#v", rm)
-		panic("Invalid reference")
+		panic(fmt.Sprintf("Invalid reference: %s", key))
 	}
 	return v
 }
 
-func runSceneScript(scene string) (*gnr.Scene, error) {
+func (j *job) runSceneScript() (*gnr.Scene, error) {
 	vm := otto.New()
 
 	rm := refMap{}
@@ -40,7 +38,7 @@ func runSceneScript(scene string) (*gnr.Scene, error) {
 			return ref
 		})
 	}
-	ref, err := vm.Run(scene)
+	ref, err := vm.Run(j.Scene)
 	if err != nil {
 		return nil, err
 	}

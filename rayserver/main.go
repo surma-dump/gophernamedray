@@ -43,10 +43,27 @@ func main() {
 		},
 		"/jobs/[0-9a-f-]+": httptools.List{
 			httptools.DiscardPathElements(1),
-			httptools.SilentHandlerFunc(checkJobValidity),
+			httptools.SilentHandlerFunc(extractJobId),
 			httptools.MethodSwitch{
 				"GET":    http.HandlerFunc(showJob),
 				"DELETE": http.HandlerFunc(deleteJob),
+			},
+		},
+		"/images/[0-9a-f-]+": httptools.List{
+			httptools.DiscardPathElements(1),
+			httptools.SilentHandlerFunc(extractJobId),
+			httptools.MethodSwitch{
+				"GET": http.HandlerFunc(listImages),
+			},
+		},
+		"/images/[0-9a-f-]+/[^/]+": httptools.List{
+			httptools.DiscardPathElements(1),
+			httptools.SilentHandlerFunc(extractJobId),
+			httptools.DiscardPathElements(1),
+			httptools.SilentHandlerFunc(extractImageId),
+			httptools.MethodSwitch{
+				"GET":    http.HandlerFunc(serveImage),
+				"DELETE": http.HandlerFunc(deleteImage),
 			},
 		},
 		"/": http.FileServer(http.Dir(*static)),
@@ -56,25 +73,43 @@ func main() {
 	}
 }
 
-func checkJobValidity(w http.ResponseWriter, r *http.Request) {
-	id := strings.TrimPrefix(r.URL.Path, "/")
+func extractJobId(w http.ResponseWriter, r *http.Request) {
+	parts := strings.SplitN(strings.TrimPrefix(r.URL.Path, "/"), "/", 2)
 	valid := false
 	func() {
 		jobs.RLock()
 		defer jobs.RUnlock()
-		_, valid = jobs.Map[id]
+		_, valid = jobs.Map[parts[0]]
 	}()
 	if !valid {
 		ErrorWithMessage(w, http.StatusNotFound)
 		return
 	}
-	r.Header.Set("X-Job-ID", id)
+	r.Header.Set("X-Job-ID", parts[0])
+}
+
+func extractImageId(w http.ResponseWriter, r *http.Request) {
+	parts := strings.SplitN(strings.TrimPrefix(r.URL.Path, "/"), "/", 2)
+	jobId := r.Header.Get("X-Job-ID")
+	var j *job
+	func() {
+		jobs.RLock()
+		defer jobs.RUnlock()
+		j = jobs.Map[jobId]
+	}()
+	_, ok := j.Compositions[parts[0]]
+	if !ok {
+		ErrorWithMessage(w, http.StatusNotFound)
+		return
+	}
+	r.Header.Set("X-Image-ID", parts[0])
 }
 
 func createJob(w http.ResponseWriter, r *http.Request) {
 	j := &job{
-		ID:    NewUUID(),
-		Start: time.Now(),
+		ID:           NewUUID(),
+		Start:        time.Now(),
+		Compositions: map[string][]byte{},
 	}
 	err := json.NewDecoder(r.Body).Decode(j)
 	if err != nil {
@@ -83,7 +118,7 @@ func createJob(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	go runJob(j)
+	go j.run()
 
 	func() {
 		jobs.Lock()
@@ -124,6 +159,49 @@ func deleteJob(w http.ResponseWriter, r *http.Request) {
 		defer jobs.Unlock()
 		delete(jobs.Map, id)
 	}()
+	ErrorWithMessage(w, http.StatusNoContent)
+}
+
+func listImages(w http.ResponseWriter, r *http.Request) {
+	id := r.Header.Get("X-Job-ID")
+	var j *job
+	func() {
+		jobs.RLock()
+		defer jobs.RUnlock()
+		j = jobs.Map[id]
+	}()
+
+	list := make([]string, 0, len(j.Compositions))
+	for key := range j.Compositions {
+		list = append(list, key)
+	}
+	json.NewEncoder(w).Encode(list)
+}
+
+func serveImage(w http.ResponseWriter, r *http.Request) {
+	id := r.Header.Get("X-Job-ID")
+	var j *job
+	func() {
+		jobs.RLock()
+		defer jobs.RUnlock()
+		j = jobs.Map[id]
+	}()
+
+	img := j.Compositions[r.Header.Get("X-Image-ID")]
+	w.Header().Set("Content-Type", "image/png")
+	w.Write(img)
+}
+
+func deleteImage(w http.ResponseWriter, r *http.Request) {
+	id := r.Header.Get("X-Job-ID")
+	var j *job
+	func() {
+		jobs.RLock()
+		defer jobs.RUnlock()
+		j = jobs.Map[id]
+	}()
+
+	delete(j.Compositions, r.Header.Get("X-Image-ID"))
 	ErrorWithMessage(w, http.StatusNoContent)
 }
 

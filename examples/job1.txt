@@ -1,14 +1,27 @@
 {
   "comment": "Run this with: curl -i -X POST -d @job1.txt http://localhost:5000/jobs",
-  "scene": "Scene(
-  PlanarCamera(
-    Vector(0, 1, -5), /* Position */
-    Vector(0, 0, -1), /* View direction */
-    60                /* Angle */
-  ),
-  AxisAlignedBox(
-    Vector(1, 2, 0),
-    Vector(2, 3, 1)
-  )
-);"
+  "scene": "
+  Scene(
+    PlanarCamera(
+      Vector(0, 1, -5), /* Position */
+      Vector(0, 0, -1), /* View direction */
+      60                /* Angle */
+    ),
+    AxisAlignedBox(
+      Vector(1, 2, 0),
+      Vector(2, 3, 1)
+    )
+  );
+  ",
+  "composite": "
+  composition('distance', function(x, y) {
+    var ir = interactions[y*width+x];
+    var l = ir.Distance/5;
+    return {
+      r: l,
+      g: l,
+      b: l
+    };
+  });
+  "
 }
