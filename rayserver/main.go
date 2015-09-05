@@ -1,254 +1,218 @@
 package main
 
 import (
-	"fmt"
-	"image"
-	"image/color"
-	"image/draw"
-	"image/png"
+	"encoding/json"
+	"flag"
 	"log"
-	"os"
-	"runtime/pprof"
+	"net/http"
+	"strings"
+	"sync"
+	"time"
 
-	"github.com/surma-dump/gophernamedray/gnr"
-	"github.com/surma-dump/gophernamedray/gnr/object"
+	"github.com/nu7hatch/gouuid"
+	"github.com/surma/httptools"
 )
 
 const (
 	Width  = 600
 	Height = 600
-
-	AxisHeads = 0.2
 )
 
-func main() {
-	scene := &gnr.Scene{
-		Object: &gnr.FlatShader{
-			Object: gnr.NewLayers(
-				gnr.NewUnion(
-					&gnr.ColorChanger{
-						Object: &gnr.Union{
-							Objects: []gnr.Object{
-								&object.Triangle{
-									Points: [3]*gnr.Vector3f{
-										{0, -AxisHeads, 0},
-										{1, 0, 0},
-										{0, AxisHeads, 0},
-									},
-								},
-								&object.Triangle{
-									Points: [3]*gnr.Vector3f{
-										{0, 0, -AxisHeads},
-										{1, 0, 0},
-										{0, 0, AxisHeads},
-									},
-								},
-							},
-						},
-						NewColor: gnr.ColorRed,
-					},
-					&gnr.ColorChanger{
-						Object: gnr.NewUnion(
-							&object.Triangle{
-								Points: [3]*gnr.Vector3f{
-									{-AxisHeads, 0, 0},
-									{AxisHeads, 0, 0},
-									{0, 1, 0},
-								},
-							},
-							&object.Triangle{
-								Points: [3]*gnr.Vector3f{
-									{0, 0, -AxisHeads},
-									{0, 0, AxisHeads},
-									{0, 1, 0},
-								},
-							},
-						),
-						NewColor: gnr.ColorGreen,
-					},
-					&gnr.ColorChanger{
-						Object: gnr.NewUnion(
-							&object.Triangle{
-								Points: [3]*gnr.Vector3f{
-									{-AxisHeads, 0, 0},
-									{AxisHeads, 0, 0},
-									{0, 0, 1},
-								},
-							},
-							&object.Triangle{
-								Points: [3]*gnr.Vector3f{
-									{0, -AxisHeads, 0},
-									{0, 0, 1},
-									{0, AxisHeads, 0},
-								},
-							},
-						),
-						NewColor: gnr.ColorBlue,
-					},
-				), // Union
-				gnr.NewUnion(
-					&gnr.XZChecker{
-						Object: &object.Plane{
-							Normal:   &gnr.Vector3f{0, 1, 0},
-							Distance: 0,
-						},
-						ColorA: gnr.ColorWhite,
-						ColorB: gnr.ColorBlack,
-					},
-					&gnr.ColorChanger{
-						Object: &object.Triangle{
-							Points: [3]*gnr.Vector3f{
-								{-2, 2, 0},
-								{0, 2, 0},
-								{-1, 4, 0},
-							},
-						},
-						NewColor: gnr.ColorYellow,
-					},
-					&gnr.ColorChanger{
-						Object: &object.Triangle{
-							Points: [3]*gnr.Vector3f{
-								{2, 2, 0},
-								{0, 2, 0},
-								{1, 4, 0},
-							},
-						},
-						NewColor: gnr.ColorCyan,
-					},
-					&gnr.ColorChanger{
-						Object: &object.Sphere{
-							Center: &gnr.Vector3f{1, 1, 0},
-							Radius: 1,
-						},
-						NewColor: gnr.ColorBlue,
-					},
-					gnr.NewIntersection(
-						&gnr.ColorChanger{
-							Object: &object.AxisAlignedBox{
-								Min: &gnr.Vector3f{-1, 0.5, -0.5},
-								Max: &gnr.Vector3f{0, 1.5, 0.5},
-							},
-							NewColor: gnr.ColorRed,
-						},
-						&gnr.ColorChanger{
-							Object: &object.Sphere{
-								Center: &gnr.Vector3f{-0.5, 1, 0},
-								Radius: 0.7,
-							},
-							NewColor: gnr.ColorGreen,
-						},
-					),
-					&gnr.Difference{
-						Minuend: &gnr.ColorChanger{
-							Object: &object.AxisAlignedBox{
-								Min: &gnr.Vector3f{-2.5, 0.5, -0.5},
-								Max: &gnr.Vector3f{-1.5, 1.5, 0.5},
-							},
-							NewColor: gnr.ColorMagenta,
-						},
-						Subtrahend: &gnr.ColorChanger{
-							Object: &object.Sphere{
-								Center: &gnr.Vector3f{-1.5, 1.5, -0.5},
-								Radius: 0.5,
-							},
-							NewColor: gnr.ColorGreen,
-						},
-					},
-				), // Union
-			), // Layers
-			FalloffFunc: gnr.NewLinearFalloffFunc(&gnr.Vector3f{-3, -5, 1}),
-		}, // FlatShader
-	}
+type jobMap struct {
+	Map map[string]*job
+	sync.RWMutex
+}
 
-	cameras := []gnr.Camera{
-		&gnr.PlanarCamera{
-			Position:      &gnr.Vector3f{3, 3, -3},
-			ViewDirection: &gnr.Vector3f{-3, -3, 3},
-			UpDirection:   &gnr.Vector3f{0, 1, 0},
-			PixelWidth:    Width,
-			PixelHeight:   Height,
-			VirtualWidth:  1,
-			VirtualHeight: 1,
-			Angle:         60.0,
+var jobs = &jobMap{
+	Map: map[string]*job{},
+}
+
+func main() {
+	var (
+		listen = flag.String("listen", "localhost:5000", "Address to bind webserver to")
+		static = flag.String("static", "./static", "Path to static folder")
+	)
+
+	flag.Parse()
+
+	log.Printf("Starting webserver on %s...", *listen)
+	err := http.ListenAndServe(*listen, httptools.NewRegexpSwitch(map[string]http.Handler{
+		"/jobs": httptools.MethodSwitch{
+			"GET":  http.HandlerFunc(listJobs),
+			"POST": http.HandlerFunc(createJob),
 		},
-		&gnr.SphericalCamera{
-			Position:      &gnr.Vector3f{3, 3, -3},
-			ViewDirection: &gnr.Vector3f{-3, -3, 3},
-			UpDirection:   &gnr.Vector3f{0, 1, 0},
-			PixelWidth:    Width,
-			PixelHeight:   Height,
-			Angle:         60.0,
+		"/jobs/[0-9a-f-]+": httptools.List{
+			httptools.DiscardPathElements(1),
+			httptools.SilentHandlerFunc(extractJobId),
+			httptools.MethodSwitch{
+				"GET":    http.HandlerFunc(showJob),
+				"DELETE": http.HandlerFunc(deleteJob),
+			},
 		},
-	}
-	f, err := os.Create("cpu.prof")
+		"/images/[0-9a-f-]+": httptools.List{
+			httptools.DiscardPathElements(1),
+			httptools.SilentHandlerFunc(extractJobId),
+			httptools.MethodSwitch{
+				"GET": http.HandlerFunc(listImages),
+			},
+		},
+		"/images/[0-9a-f-]+/[^/]+": httptools.List{
+			httptools.DiscardPathElements(1),
+			httptools.SilentHandlerFunc(extractJobId),
+			httptools.DiscardPathElements(1),
+			httptools.SilentHandlerFunc(extractImageId),
+			httptools.MethodSwitch{
+				"GET":    http.HandlerFunc(serveImage),
+				"DELETE": http.HandlerFunc(deleteImage),
+			},
+		},
+		"/": http.FileServer(http.Dir(*static)),
+	}))
 	if err != nil {
-		log.Fatal(err)
-	}
-	defer f.Close()
-	pprof.StartCPUProfile(f)
-	defer pprof.StopCPUProfile()
-	for idx, camera := range cameras {
-		scene.Camera = camera
-		scene.Camera.Normalize()
-		img := renderImage(scene)
-		f, e := os.Create(fmt.Sprintf("image_%03d.png", idx))
-		if e != nil {
-			log.Fatalf("Could not open file for writing: %s\n", e)
-		}
-		defer f.Close()
-		png.Encode(f, img)
+		log.Fatalf("Error starting webserver on %s: %s", *listen, err)
 	}
 }
 
-func renderImage(scene *gnr.Scene) image.Image {
-	img := image.NewRGBA(image.Rectangle{
-		Min: image.Point{0, 0},
-		Max: image.Point{Width * 2, Height * 2},
-	})
-	draw.Draw(img, img.Bounds(), &image.Uniform{color.Black}, image.Point{0, 0}, draw.Over)
-
-	hitImg := gnr.SubImage(img, image.Rect(0, 0, Width, Height))
-	distImg := gnr.SubImage(img, image.Rect(Width, 0, 2*Width, Height))
-	normImg := gnr.SubImage(img, image.Rect(0, Height, Width, 2*Height))
-	colImg := gnr.SubImage(img, image.Rect(Width, Height, 2*Width, 2*Height))
-
-	fFog := gnr.LerpCap(0, 15, 255, 0)
-	fNormal := gnr.LerpCap(-1, 1, 0, 255)
-	for x := uint64(0); x < Width; x++ {
-		for y := uint64(0); y < Height; y++ {
-			ir, hit := scene.TracePixel(x, y)
-
-			// Hit image
-			if hit {
-				hitImg.Set(int(x), int(y), color.White)
-			}
-
-			// Distance image
-			col := color.RGBA{
-				R: uint8(fFog(ir.Distance)),
-				G: uint8(fFog(ir.Distance)),
-				B: uint8(fFog(ir.Distance)),
-				A: 255,
-			}
-			if hit {
-				distImg.Set(int(x), int(y), col)
-			}
-
-			// Normal image
-			col = color.RGBA{
-				R: uint8(fNormal(ir.Normal.X)),
-				G: uint8(fNormal(ir.Normal.Y)),
-				B: uint8(fNormal(ir.Normal.Z)),
-				A: 255,
-			}
-			if hit {
-				normImg.Set(int(x), int(y), col)
-			}
-
-			if hit {
-				colImg.Set(int(x), int(y), ir.Color.ToColor())
-			}
-		}
+func extractJobId(w http.ResponseWriter, r *http.Request) {
+	parts := strings.SplitN(strings.TrimPrefix(r.URL.Path, "/"), "/", 2)
+	valid := false
+	func() {
+		jobs.RLock()
+		defer jobs.RUnlock()
+		_, valid = jobs.Map[parts[0]]
+	}()
+	if !valid {
+		ErrorWithMessage(w, http.StatusNotFound)
+		return
 	}
-	return img
+	r.Header.Set("X-Job-ID", parts[0])
+}
+
+func extractImageId(w http.ResponseWriter, r *http.Request) {
+	parts := strings.SplitN(strings.TrimPrefix(r.URL.Path, "/"), "/", 2)
+	jobId := r.Header.Get("X-Job-ID")
+	var j *job
+	func() {
+		jobs.RLock()
+		defer jobs.RUnlock()
+		j = jobs.Map[jobId]
+	}()
+	_, ok := j.Compositions[parts[0]]
+	if !ok {
+		ErrorWithMessage(w, http.StatusNotFound)
+		return
+	}
+	r.Header.Set("X-Image-ID", parts[0])
+}
+
+func createJob(w http.ResponseWriter, r *http.Request) {
+	j := &job{
+		ID:           NewUUID(),
+		Start:        time.Now(),
+		Compositions: map[string][]byte{},
+	}
+	err := json.NewDecoder(r.Body).Decode(j)
+	if err != nil {
+		ErrorWithMessage(w, http.StatusBadRequest)
+		log.Printf("Error parsing body: %s", err)
+		return
+	}
+
+	go j.run()
+
+	func() {
+		jobs.Lock()
+		defer jobs.Unlock()
+		jobs.Map[j.ID] = j
+	}()
+	http.Error(w, j.ID, http.StatusCreated)
+}
+
+func listJobs(w http.ResponseWriter, r *http.Request) {
+	var list []string
+	func() {
+		jobs.RLock()
+		defer jobs.RUnlock()
+		list = make([]string, 0, len(jobs.Map))
+		for key := range jobs.Map {
+			list = append(list, key)
+		}
+	}()
+	json.NewEncoder(w).Encode(map[string]interface{}{"result": list})
+}
+
+func showJob(w http.ResponseWriter, r *http.Request) {
+	id := r.Header.Get("X-Job-ID")
+	var j *job
+	func() {
+		jobs.RLock()
+		defer jobs.RUnlock()
+		j = jobs.Map[id]
+	}()
+
+	json.NewEncoder(w).Encode(j)
+}
+func deleteJob(w http.ResponseWriter, r *http.Request) {
+	id := r.Header.Get("X-Job-ID")
+	func() {
+		jobs.Lock()
+		defer jobs.Unlock()
+		delete(jobs.Map, id)
+	}()
+	ErrorWithMessage(w, http.StatusNoContent)
+}
+
+func listImages(w http.ResponseWriter, r *http.Request) {
+	id := r.Header.Get("X-Job-ID")
+	var j *job
+	func() {
+		jobs.RLock()
+		defer jobs.RUnlock()
+		j = jobs.Map[id]
+	}()
+
+	list := make([]string, 0, len(j.Compositions))
+	for key := range j.Compositions {
+		list = append(list, key)
+	}
+	json.NewEncoder(w).Encode(list)
+}
+
+func serveImage(w http.ResponseWriter, r *http.Request) {
+	id := r.Header.Get("X-Job-ID")
+	var j *job
+	func() {
+		jobs.RLock()
+		defer jobs.RUnlock()
+		j = jobs.Map[id]
+	}()
+
+	img := j.Compositions[r.Header.Get("X-Image-ID")]
+	w.Header().Set("Content-Type", "image/png")
+	w.Write(img)
+}
+
+func deleteImage(w http.ResponseWriter, r *http.Request) {
+	id := r.Header.Get("X-Job-ID")
+	var j *job
+	func() {
+		jobs.RLock()
+		defer jobs.RUnlock()
+		j = jobs.Map[id]
+	}()
+
+	delete(j.Compositions, r.Header.Get("X-Image-ID"))
+	ErrorWithMessage(w, http.StatusNoContent)
+}
+
+func ErrorWithMessage(w http.ResponseWriter, code int) {
+	http.Error(w, http.StatusText(code), code)
+}
+
+func NewUUID() string {
+	id, err := uuid.NewV4()
+	if err != nil {
+		panic(err)
+	}
+	return id.String()
 }

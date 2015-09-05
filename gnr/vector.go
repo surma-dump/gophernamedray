@@ -6,7 +6,9 @@ import (
 )
 
 type Vector3f struct {
-	X, Y, Z float64
+	X float64
+	Y float64
+	Z float64
 }
 
 func CopyVector3f(v *Vector3f) *Vector3f {
