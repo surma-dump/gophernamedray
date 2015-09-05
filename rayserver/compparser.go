@@ -17,10 +17,10 @@ type composition struct {
 	Func otto.Value
 }
 
-func (j *job) runCompScript(ir []*gnr.InteractionResult) {
+func (j *job) runCompScript(irs [][]*gnr.InteractionResult) {
 	vm := otto.New()
 
-	if err := vm.Set("interactions", ir); err != nil {
+	if err := vm.Set("interactions", irs); err != nil {
 		panic(err)
 	}
 	vm.Set("width", Width)
@@ -71,9 +71,26 @@ var colorF = gnr.LerpCap(0, 1, 0, float64(0xff))
 
 func mapToColor(o map[string]interface{}) color.Color {
 	var c color.RGBA
-	c.R = uint8(colorF(o["r"].(float64)))
-	c.G = uint8(colorF(o["r"].(float64)))
-	c.B = uint8(colorF(o["r"].(float64)))
+
+	// Because JavaScript
+	switch x := o["r"].(type) {
+	case int64:
+		c.R = uint8(colorF(float64(x)))
+	case float64:
+		c.R = uint8(colorF(x))
+	}
+	switch x := o["g"].(type) {
+	case int64:
+		c.G = uint8(colorF(float64(x)))
+	case float64:
+		c.G = uint8(colorF(x))
+	}
+	switch x := o["b"].(type) {
+	case int64:
+		c.B = uint8(colorF(float64(x)))
+	case float64:
+		c.B = uint8(colorF(x))
+	}
 	c.A = 0xff
 	return c
 }

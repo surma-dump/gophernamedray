@@ -4,7 +4,7 @@
   Scene(
     PlanarCamera(
       Vector(0, 1, -5), /* Position */
-      Vector(0, 0, -1), /* View direction */
+      Vector(0, 0, 1), /* View direction */
       60                /* Angle */
     ),
     AxisAlignedBox(
@@ -14,13 +14,27 @@
   );
   ",
   "composite": "
+  var max = 10.0;
   composition('distance', function(x, y) {
-    var ir = interactions[y*width+x];
-    var l = ir.Distance/5;
+    var irs = interactions[y*width+x];
+    if(irs.length === 0) {
+      return {
+        r: 0,
+        g: 0,
+        b: 0
+      }
+    }
+    var d = 1 - irs[0].Distance/max;
+    if(d < 0) {
+      d = 0.0;
+    }
+    if(d > 1) {
+      d = 1.0;
+    }
     return {
-      r: l,
-      g: l,
-      b: l
+      r: d,
+      g: d,
+      b: d
     };
   });
   "

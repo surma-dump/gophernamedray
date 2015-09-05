@@ -8,13 +8,13 @@ import (
 )
 
 type job struct {
-	ID           string
-	Scene        string
-	Composite    string
-	Start        time.Time
-	End          time.Time
-	Error        string
-	Compositions map[string][]byte
+	ID           string            `json:"id"`
+	Scene        string            `json:"scene"`
+	Composite    string            `json:"composite"`
+	Start        time.Time         `json:"start"`
+	End          time.Time         `json:"end"`
+	Error        string            `json:"error"`
+	Compositions map[string][]byte `json:"-"`
 }
 
 func (j *job) run() {
@@ -39,10 +39,10 @@ func (j *job) run() {
 		j.Error = err.Error()
 		return
 	}
-	irs := make([]*gnr.InteractionResult, 0, Width*Height)
+	irs := make([][]*gnr.InteractionResult, 0, Width*Height)
 	for y := uint64(0); y < Height; y++ {
 		for x := uint64(0); x < Width; x++ {
-			ir, _ := scene.TracePixel(x, y)
+			ir := scene.TracePixel(x, y)
 			irs = append(irs, ir)
 		}
 	}
