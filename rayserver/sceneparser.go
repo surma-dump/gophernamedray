@@ -98,4 +98,58 @@ var sceneEnv = map[string]func(refMap) func(otto.FunctionCall) interface{}{
 			}
 		}
 	},
+	"Sphere": func(rm refMap) func(otto.FunctionCall) interface{} {
+		return func(call otto.FunctionCall) interface{} {
+			r, err := call.Argument(1).ToFloat()
+			if err != nil {
+				panic(err)
+			}
+			return &object.Sphere{
+				Center: rm.MustResolve(call.Argument(0)).(*gnr.Vector3f),
+				Radius: r,
+			}
+		}
+	},
+	"Plane": func(rm refMap) func(otto.FunctionCall) interface{} {
+		return func(call otto.FunctionCall) interface{} {
+			d, err := call.Argument(1).ToFloat()
+			if err != nil {
+				panic(err)
+			}
+			return &object.Plane{
+				Normal:   rm.MustResolve(call.Argument(0)).(*gnr.Vector3f),
+				Distance: d,
+			}
+		}
+	},
+	"Intersection": func(rm refMap) func(otto.FunctionCall) interface{} {
+		return func(call otto.FunctionCall) interface{} {
+			i := &gnr.Intersection{
+				Objects: make([]gnr.Object, 0, len(call.ArgumentList)),
+			}
+			for _, obj := range call.ArgumentList {
+				i.Objects = append(i.Objects, rm.MustResolve(obj).(gnr.Object))
+			}
+			return i
+		}
+	},
+	"Union": func(rm refMap) func(otto.FunctionCall) interface{} {
+		return func(call otto.FunctionCall) interface{} {
+			u := &gnr.Union{
+				Objects: make([]gnr.Object, 0, len(call.ArgumentList)),
+			}
+			for _, obj := range call.ArgumentList {
+				u.Objects = append(u.Objects, rm.MustResolve(obj).(gnr.Object))
+			}
+			return u
+		}
+	},
+	"Difference": func(rm refMap) func(otto.FunctionCall) interface{} {
+		return func(call otto.FunctionCall) interface{} {
+			return &gnr.Difference{
+				Minuend:    rm.MustResolve(call.Argument(0)).(gnr.Object),
+				Subtrahend: rm.MustResolve(call.Argument(0)).(gnr.Object),
+			}
+		}
+	},
 }
