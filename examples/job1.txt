@@ -3,8 +3,8 @@
   "scene": "
   Scene(
     PlanarCamera(
-      Vector(0, 1, -5), /* Position */
-      Vector(0, 0, 1), /* View direction */
+      Vector(3.7, 2.7, -5), /* Position */
+      Vector(-0.5, -0.2, 1), /* View direction */
       60                /* Angle */
     ),
     Union(
@@ -34,43 +34,51 @@
   );
   ",
   "composite": "
-  var config = {
-    maxDistance: 10.0
-  };
-  var black = {r: 0, g:0, b:0};
-  var white = {r: 1, g:1, b:1};
+  var black = {X: 0, Y:0, Z:0};
+  var white = {X: 1, Y:1, Z:1};
+
+  var maxHits = null;
+  var hitF = null;
   composition('hit', function(x, y) {
+    if(!maxHits) {
+      maxHits = _(interactions).max(function(i){return i.length}).length;
+      hitF = gnr.vlerpCap(0, maxHits, black, white);
+    }
     var irs = interactions[y*width+x];
-    return irs.length == 0 ? black : white;
+    return gnr.vector2Color(hitF(irs.length));
   });
+
+  var normalF = gnr.lerpCap(-1, 1, 0, 1);
+  composition('normal', function(x, y) {
+    var irs = interactions[y*width+x];
+    if(irs.length === 0) {
+      return gnr.vector2Color(black);
+    }
+    var c = irs[0].Normal;
+    c.X = normalF(c.X);
+    c.Y = normalF(c.Y);
+    c.Z = normalF(c.Z);
+    return gnr.vector2Color(irs[0].Normal);
+  });
+
+  var distF = gnr.vlerpCap(0, 10, white, black);
   composition('depth', function(x, y) {
     var irs = interactions[y*width+x];
     if(irs.length === 0) {
-      return black;
+      return gnr.vector2Color(black);
     }
-    var d = 1 - irs[0].Distance/config.maxDistance;
-    if(d < 0) {
-      d = 0.0;
-    }
-    if(d > 1) {
-      d = 1.0;
-    }
-    return {
-      r: d,
-      g: d,
-      b: d
-    };
+    return gnr.vector2Color(distF(irs[0].Distance));
   });
-  composition('color', function(x, y) {
+
+  var viewDir = {X: -0.5, Y: -0.2, Z: 1};
+  var colorF = gnr.vlerpCap(-1, 1, white, black);
+  composition('phong', function(x, y) {
     var irs = interactions[y*width+x];
     if(irs.length === 0) {
-      return black;
+      return gnr.vector2Color(black);
     }
-    return {
-      r: irs[0].Color.X,
-      g: irs[0].Color.Y,
-      b: irs[0].Color.Z,
-    };
+    var cosAlpha = gnr.vector.product(irs[0].Normal, viewDir);
+    return gnr.vector2Color(colorF(cosAlpha));
   });
   "
 }

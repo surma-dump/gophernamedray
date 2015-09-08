@@ -5,6 +5,7 @@ import (
 	"image"
 	"image/color"
 	"image/png"
+	"math"
 
 	"github.com/robertkrimen/otto"
 	_ "github.com/robertkrimen/otto/underscore"
@@ -19,6 +20,8 @@ type composition struct {
 
 func (j *job) runCompScript(irs [][]*gnr.InteractionResult) {
 	vm := otto.New()
+
+	injectRuntime(vm)
 
 	if err := vm.Set("interactions", irs); err != nil {
 		panic(err)
@@ -93,4 +96,82 @@ func mapToColor(o map[string]interface{}) color.Color {
 	}
 	c.A = 0xff
 	return c
+}
+
+func injectRuntime(vm *otto.Otto) {
+	var err error
+	err = vm.Set("sqrt", func(call otto.FunctionCall) otto.Value {
+		f, err := call.Argument(0).ToFloat()
+		if err != nil {
+			panic(err)
+		}
+		r, err := otto.ToValue(math.Sqrt(f))
+		if err != nil {
+			panic(err)
+		}
+		return r
+	})
+	_, err = vm.Run(`
+	gnr = {
+		lerp: function(minIn, maxIn, minOut, maxOut) {
+			return function(d) {
+				return (d - minIn)/(maxIn - minIn)*(maxOut - minOut) + minOut;
+			}
+		},
+		lerpCap: function(minIn, maxIn, minOut, maxOut) {
+			var f = gnr.lerp(minIn, maxIn, minOut, maxOut);
+			return function(d) {
+				if(d < minIn) {
+					d = minIn;
+				}
+				if(d > maxIn) {
+					d = maxIn;
+				}
+				return f(d);
+			}
+		},
+		vlerp: function(minIn, maxIn, minOut, maxOut) {
+			var xLerp = gnr.lerp(minIn, maxIn, minOut.X, maxOut.X);
+			var yLerp = gnr.lerp(minIn, maxIn, minOut.Y, maxOut.Y);
+			var zLerp = gnr.lerp(minIn, maxIn, minOut.Z, maxOut.Z);
+			return function(d) {
+				return {
+					X: xLerp(d),
+					Y: yLerp(d),
+					Z: zLerp(d)
+				};
+			};
+		},
+		vlerpCap: function(minIn, maxIn, minOut, maxOut) {
+			var xLerp = gnr.lerpCap(minIn, maxIn, minOut.X, maxOut.X);
+			var yLerp = gnr.lerpCap(minIn, maxIn, minOut.Y, maxOut.Y);
+			var zLerp = gnr.lerpCap(minIn, maxIn, minOut.Z, maxOut.Z);
+			return function(d) {
+				return {
+					X: xLerp(d),
+					Y: yLerp(d),
+					Z: zLerp(d)
+				};
+			};
+		},
+		vector2Color: function(v) {
+			return {
+				r: v.X,
+				g: v.Y,
+				b: v.Z
+			};
+		},
+		vector: {
+		  product: function(v1, v2) {
+				return v1.X * v2.X + v1.Y * v2.Y + v1.Z * v2.Z;
+			},
+			length: function(v) {
+				return sqrt(gnr.vector.product(v, v));
+			}
+	  }
+	}
+	`)
+	if err != nil {
+		panic(err)
+	}
 }
