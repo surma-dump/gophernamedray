@@ -10,7 +10,7 @@ import (
 	"github.com/robertkrimen/otto"
 	_ "github.com/robertkrimen/otto/underscore"
 
-	"github.com/surma-dump/gophernamedray/gnr"
+	"go.surma.link/gophernamedray/gnr"
 )
 
 type composition struct {

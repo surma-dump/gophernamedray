@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/surma-dump/gophernamedray/gnr"
+	"go.surma.link/gophernamedray/gnr"
 )
 
 type job struct {

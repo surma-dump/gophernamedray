@@ -6,8 +6,8 @@ import (
 	"github.com/robertkrimen/otto"
 	_ "github.com/robertkrimen/otto/underscore"
 
-	"github.com/surma-dump/gophernamedray/gnr"
-	"github.com/surma-dump/gophernamedray/gnr/object"
+	"go.surma.link/gophernamedray/gnr"
+	"go.surma.link/gophernamedray/gnr/object"
 )
 
 type refMap map[string]interface{}

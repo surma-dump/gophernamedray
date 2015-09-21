@@ -3,7 +3,7 @@ package object
 import (
 	"math"
 
-	"github.com/surma-dump/gophernamedray/gnr"
+	"go.surma.link/gophernamedray/gnr"
 )
 
 type AxisAlignedBox struct {

@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"math"
 
-	"github.com/surma-dump/gophernamedray/gnr"
+	"go.surma.link/gophernamedray/gnr"
 )
 
 // Triangle models an 2D triangle in 3D space
