@@ -14,7 +14,7 @@ type Sphere struct {
 func (s *Sphere) RayInteraction(r *gnr.Ray) []*gnr.InteractionResult {
 	// Ray: {P | P = r.Origin + t * r.Direction}
 	// Sphere: {P | mag(P - s.Center)^2 - s.Radius^2 = 0}
-	// subsitution
+	// substitution
 	// mag(r.Origin + t * r.Direction)^2 - s.Radius^2 = 0
 	d := gnr.VectorDifference(r.Origin, s.Center)
 	p := 2 * gnr.VectorProduct(r.Direction, d)
